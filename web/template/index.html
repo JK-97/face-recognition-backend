@@ -1,0 +1,23 @@
+<head>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/video-dev/clappr-rtmp-plugin@latest/dist/rtmp.min.js"></script>
+</head>
+
+<body>
+	<div id="player-wrapper"></div>
+
+	
+	<script>
+		var player = new Clappr.Player({
+			width: "100%",
+			height: "100%",
+			source: "rtmp://192.168.4.1:30176/live/person_detect",
+			autoPlay: true,
+			parentId: "#player-wrapper",
+			plugins: {'playback': [RTMP]},
+			rtmpConfig: {
+					playbackType: 'live',
+			},
+		});
+  </script>
+</body>
