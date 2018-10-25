@@ -1,40 +1,49 @@
-# Build Stage
-FROM images.jiangxingai.com:5000/tf-pose-backend:1.11 AS build-stage
+FROM golang:latest
 
-LABEL app="build-tf-pose-backend"
-LABEL REPO="https://gitlab.jiangxingai.com/luyor/tf-pose-backend"
+WORKDIR /backend
+COPY ./bin/tf-pose-backend /backend
+COPY ./web /backend/web
 
-ENV PROJPATH=/go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend
+ENTRYPOINT [ "/backend/tf-pose-backend" ]
+CMD [ "serve" ]
 
-# Because of https://github.com/docker/docker/issues/14914
-ENV PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+# # Build Stage
+# FROM images.jiangxingai.com:5000/tf-pose-backend:1.11 AS build-stage
 
-ADD . /go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend
-WORKDIR /go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend
+# LABEL app="build-tf-pose-backend"
+# LABEL REPO="https://gitlab.jiangxingai.com/luyor/tf-pose-backend"
 
-RUN make build-alpine
+# ENV PROJPATH=/go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend
 
-# Final Stage
-FROM images.jiangxingai.com:5000/tf-pose-backend
+# # Because of https://github.com/docker/docker/issues/14914
+# ENV PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
-ARG GIT_COMMIT
-ARG VERSION
-LABEL REPO="https://gitlab.jiangxingai.com/luyor/tf-pose-backend"
-LABEL GIT_COMMIT=$GIT_COMMIT
-LABEL VERSION=$VERSION
+# ADD . /go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend
+# WORKDIR /go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend
 
-# Because of https://github.com/docker/docker/issues/14914
-ENV PATH=$PATH:/opt/tf-pose-backend/bin
+# RUN make build-alpine
 
-WORKDIR /opt/tf-pose-backend/bin
+# # Final Stage
+# FROM images.jiangxingai.com:5000/tf-pose-backend
 
-COPY --from=build-stage /go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend/bin/tf-pose-backend /opt/tf-pose-backend/bin/
-RUN chmod +x /opt/tf-pose-backend/bin/tf-pose-backend
+# ARG GIT_COMMIT
+# ARG VERSION
+# LABEL REPO="https://gitlab.jiangxingai.com/luyor/tf-pose-backend"
+# LABEL GIT_COMMIT=$GIT_COMMIT
+# LABEL VERSION=$VERSION
 
-# Create appuser
-RUN adduser -D -g '' tf-pose-backend
-USER tf-pose-backend
+# # Because of https://github.com/docker/docker/issues/14914
+# ENV PATH=$PATH:/opt/tf-pose-backend/bin
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+# WORKDIR /opt/tf-pose-backend/bin
 
-CMD ["/opt/tf-pose-backend/bin/tf-pose-backend"]
+# COPY --from=build-stage /go/src/gitlab.jiangxingai.com/luyor/tf-pose-backend/bin/tf-pose-backend /opt/tf-pose-backend/bin/
+# RUN chmod +x /opt/tf-pose-backend/bin/tf-pose-backend
+
+# # Create appuser
+# RUN adduser -D -g '' tf-pose-backend
+# USER tf-pose-backend
+
+# ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+# CMD ["/opt/tf-pose-backend/bin/tf-pose-backend"]
