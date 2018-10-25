@@ -27,6 +27,7 @@ help:
 build:
 	@echo "building ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
+	export CGO_ENABLED=0; \
 	go build -ldflags "-X gitlab.jiangxingai.com/luyor/tf-pose-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/tf-pose-backend/version.BuildDate=${BUILD_DATE}" -o bin/${BIN_NAME}
 
 get-deps:

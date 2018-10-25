@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM scratch
 
 WORKDIR /backend
 COPY ./bin/tf-pose-backend /backend
