@@ -8,7 +8,7 @@ GIT_DIRTY=$(shell test -n "`git status --porcelain`" && echo "+CHANGES" || true)
 BUILD_DATE=$(shell date '+%Y-%m-%d-%H:%M:%S')
 IMAGE_NAME := "images.jiangxingai.com:5000/tf-pose-backend"
 
-default: test
+default: build
 
 help:
 	@echo 'Management commands for tf-pose-backend:'
