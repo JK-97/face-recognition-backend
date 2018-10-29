@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
+	"gitlab.jiangxingai.com/luyor/tf-pose-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/tf-pose-backend/internal/app/route"
 )
 
@@ -33,8 +34,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		route.Routes()
-		log.Fatal(http.ListenAndServe(":80", nil))
+		model.Listen("192.168.3.33:6379", "tf-pose")
+
+		go func() {
+			route.Routes()
+			log.Fatal(http.ListenAndServe(":80", nil))
+		}()
+
+		forever := make(chan struct{})
+		<-forever
 	},
 }
 
