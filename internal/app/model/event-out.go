@@ -47,6 +47,9 @@ func pushEvent(title, device string, labels, detail map[string]string) error {
 
 	addr, topic := cfg.GetString("event-out-addr"), cfg.GetString("event-out-chan")
 	conn, err := redis.Dial("tcp", addr)
+	if err != nil {
+		return err
+	}
 	conn.Do("PUBLISH", topic, jsonfied)
 
 	return nil
