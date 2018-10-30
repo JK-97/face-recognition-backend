@@ -15,12 +15,12 @@
 package cmd
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/spf13/cobra"
 	"gitlab.jiangxingai.com/luyor/tf-pose-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/tf-pose-backend/internal/app/route"
+	"gitlab.jiangxingai.com/luyor/tf-pose-backend/log"
 )
 
 // serveCmd represents the serve command

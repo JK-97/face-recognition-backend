@@ -1,12 +1,11 @@
 package model
 
 import (
-	"fmt"
-	"log"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"gitlab.jiangxingai.com/luyor/tf-pose-backend/config"
+	"gitlab.jiangxingai.com/luyor/tf-pose-backend/log"
 )
 
 // Listen subscribes to messages from redis, and handle the message
@@ -19,7 +18,7 @@ func Listen() {
 		for {
 			err := listenUntilErr(addr, topic)
 
-			log.Printf("%s", err)
+			log.Errorf("Redis connection failed: %s", err)
 			time.Sleep(time.Second * 1)
 		}
 	}()
@@ -42,11 +41,11 @@ func listenUntilErr(addr, topic string) error {
 			go func() {
 				err := process(v)
 				if err != nil {
-					log.Printf("%s", err)
+					log.Errorf("Data processing failed: %s", err)
 				}
 			}()
 		case redis.Subscription:
-			fmt.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
+			log.Infof("%s: %s %d\n", v.Channel, v.Kind, v.Count)
 		case error:
 			return err
 		}
