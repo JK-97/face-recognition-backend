@@ -1,8 +1,9 @@
 FROM scratch
 
 WORKDIR /backend
-COPY ./bin/tf-pose-backend /backend
-COPY ./web /backend/web
+COPY ./bin/tf-pose-backend .
+COPY ./web ./web
+RUN mkdir ./img
 
 ENTRYPOINT [ "/backend/tf-pose-backend" ]
 CMD [ "serve" ]
