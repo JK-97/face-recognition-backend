@@ -19,3 +19,9 @@ func serveStatic(path string, w http.ResponseWriter, r *http.Request) {
 func IndexGET(w http.ResponseWriter, r *http.Request) {
 	serveStatic("web/template/index.html", w, r)
 }
+
+// ImgGET send imgs
+func ImgGET(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("/img/"):]
+	serveStatic("img/"+title, w, r)
+}
