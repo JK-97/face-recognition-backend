@@ -51,8 +51,13 @@ func readViperConfig(appName string) *viper.Viper {
 	v.SetDefault("json_logs", false)
 	v.SetDefault("loglevel", "debug")
 
+	v.SetDefault("app-name", "tf-pose")
+
 	v.SetDefault("data-in-addr", "192.168.3.33:6379")
 	v.SetDefault("data-in-chan", "tf-pose")
+
+	v.SetDefault("event-out-addr", "192.168.3.33:6379")
+	v.SetDefault("event-out-chan", "edge_dashboard_events")
 
 	return v
 }
