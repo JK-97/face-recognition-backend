@@ -18,6 +18,7 @@ import (
 type PoseMessage struct {
 	Timestamp float32
 	Image     string
+	Device    string
 	Output    string
 }
 
