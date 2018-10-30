@@ -6,11 +6,15 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
+	"gitlab.jiangxingai.com/luyor/tf-pose-backend/config"
 )
 
 // Listen subscribes to messages from redis, and handle the message
 // Try to reconnect if failed.
-func Listen(addr, topic string) {
+func Listen() {
+	cfg := config.Config()
+	addr, topic := cfg.GetString("data-in-addr"), cfg.GetString("data-in-chan")
+
 	go func() {
 		for {
 			err := listenUntilErr(addr, topic)
@@ -35,10 +39,12 @@ func listenUntilErr(addr, topic string) error {
 	for {
 		switch v := psc.Receive().(type) {
 		case redis.Message:
-			err := process(v)
-			if err != nil {
-				log.Printf("%s", err)
-			}
+			go func() {
+				err := process(v)
+				if err != nil {
+					log.Printf("%s", err)
+				}
+			}()
 		case redis.Subscription:
 			fmt.Printf("%s: %s %d\n", v.Channel, v.Kind, v.Count)
 		case error:
