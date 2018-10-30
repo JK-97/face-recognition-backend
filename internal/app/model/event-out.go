@@ -32,10 +32,14 @@ func pushEvent(title, device string, labels, detail map[string]string) error {
 	cfg := config.Config()
 	relatedApp := cfg.GetString("app-name")
 
-	id := uuid.NewV1().Bytes()
+	id, err := uuid.NewV1()
+	if err != nil {
+		return err
+	}
+
 	createdTime := time.Now().Unix()
 
-	e := Event{id, title, labels, createdTime, device, relatedApp, detail}
+	e := Event{id.Bytes(), title, labels, createdTime, device, relatedApp, detail}
 
 	jsonfied, err := json.Marshal(e)
 	if err != nil {
