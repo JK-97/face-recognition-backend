@@ -2,6 +2,7 @@ package log
 
 import (
 	"os"
+	"syscall"
 
 	"github.com/Sirupsen/logrus"
 	"gitlab.jiangxingai.com/luyor/tf-pose-backend/config"
@@ -39,20 +40,22 @@ type Logger interface {
 var defaultLogger *logrus.Logger
 
 func init() {
+	handle := syscall.Handle(os.Stdout.Fd())
+	kernel32DLL := syscall.NewLazyDLL("kernel32.dll")
+	setConsoleModeProc := kernel32DLL.NewProc("SetConsoleMode")
+	setConsoleModeProc.Call(uintptr(handle), 0x0001|0x0002|0x0004)
+
 	defaultLogger = newLogrusLogger(config.Config())
 }
-
 
 func NewLogger(cfg config.Provider) *logrus.Logger {
 	return newLogrusLogger(cfg)
 }
 
-
-
 func newLogrusLogger(cfg config.Provider) *logrus.Logger {
 
 	l := logrus.New()
-	
+
 	if cfg.GetBool("json_logs") {
 		l.Formatter = new(logrus.JSONFormatter)
 	}
@@ -68,7 +71,7 @@ func newLogrusLogger(cfg config.Provider) *logrus.Logger {
 	default:
 		l.Level = logrus.DebugLevel
 	}
-	
+
 	return l
 }
 
