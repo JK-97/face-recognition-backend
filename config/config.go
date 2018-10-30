@@ -47,10 +47,12 @@ func readViperConfig(appName string) *viper.Viper {
 	v.AutomaticEnv()
 
 	// global defaults
-	
+
 	v.SetDefault("json_logs", false)
 	v.SetDefault("loglevel", "debug")
-	
+
+	v.SetDefault("data-in-addr", "192.168.3.33:6379")
+	v.SetDefault("data-in-chan", "tf-pose")
 
 	return v
 }
