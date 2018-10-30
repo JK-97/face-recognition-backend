@@ -5,7 +5,7 @@ import (
 	"syscall"
 
 	"github.com/Sirupsen/logrus"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/config"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/config"
 )
 
 // Logger defines a set of methods for writing application logs. Derived from and

@@ -11,11 +11,11 @@ import (
 	"strings"
 
 	"github.com/gomodule/redigo/redis"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/log"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/log"
 )
 
-// PoseMessage is the detection result of tf pose detector
-type PoseMessage struct {
+// fenceMessage is the detection result of tf fence detector
+type fenceMessage struct {
 	Timestamp float32
 	Image     string
 	Device    string
@@ -23,7 +23,7 @@ type PoseMessage struct {
 }
 
 func process(msg redis.Message) error {
-	var data PoseMessage
+	var data fenceMessage
 	err := json.Unmarshal(msg.Data, &data)
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-# tf-pose-backend
+# tf-fence-backend
 
 A Golang project.
 
@@ -10,7 +10,7 @@ Running it then should be as simple as:
 
 ```console
 $ make
-$ ./bin/tf-pose-backend
+$ ./bin/tf-fence-backend
 ```
 
 ### Testing

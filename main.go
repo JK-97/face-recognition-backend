@@ -2,7 +2,7 @@ package main
 
 import (
 	
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/cmd"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/cmd"
 )
 
 func main() {
