@@ -18,15 +18,15 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/internal/app/model"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/internal/app/route"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/log"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/model"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/route"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/log"
 )
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "Serve http backend for tf-pose",
+	Short: "Serve http backend for tf-fence",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

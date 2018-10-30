@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/config"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/log"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/config"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/log"
 )
 
 // Listen subscribes to messages from redis, and handle the message

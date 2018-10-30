@@ -6,7 +6,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/satori/go.uuid"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/config"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/config"
 )
 
 // Event is a dashboard event:
@@ -32,13 +32,10 @@ func pushEvent(title, device string, labels, detail map[string]string) error {
 	cfg := config.Config()
 	relatedApp := cfg.GetString("app-name")
 
-	id, err := uuid.NewV1()
-	if err != nil {
-		return err
-	}
+	id := uuid.NewV1().Bytes()
 	createdTime := time.Now().Unix()
 
-	e := Event{id.Bytes(), title, labels, createdTime, device, relatedApp, detail}
+	e := Event{id, title, labels, createdTime, device, relatedApp, detail}
 
 	jsonfied, err := json.Marshal(e)
 	if err != nil {

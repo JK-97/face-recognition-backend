@@ -1,17 +1,17 @@
 .PHONY: build build-alpine clean test help default
 
-BIN_NAME=tf-pose-backend
+BIN_NAME=tf-fence-backend
 
 VERSION := $(shell grep "const Version " version/version.go | sed -E 's/.*"(.+)"$$/\1/')
 GIT_COMMIT=$(shell git rev-parse HEAD)
 GIT_DIRTY=$(shell test -n "`git status --porcelain`" && echo "+CHANGES" || true)
 BUILD_DATE=$(shell date '+%Y-%m-%d-%H:%M:%S')
-IMAGE_NAME := "images.jiangxingai.com:5000/tf-pose-backend"
+IMAGE_NAME := "images.jiangxingai.com:5000/tf-fence-backend"
 
 default: build
 
 help:
-	@echo 'Management commands for tf-pose-backend:'
+	@echo 'Management commands for tf-fence-backend:'
 	@echo
 	@echo 'Usage:'
 	@echo '    make build           Compile the project.'
@@ -28,7 +28,7 @@ build:
 	@echo "building ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
 	export CGO_ENABLED=0; \
-	go build -ldflags "-X gitlab.jiangxingai.com/luyor/tf-pose-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/tf-pose-backend/version.BuildDate=${BUILD_DATE}" -o bin/${BIN_NAME}
+	go build -ldflags "-X gitlab.jiangxingai.com/luyor/tf-fence-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/tf-fence-backend/version.BuildDate=${BUILD_DATE}" -o bin/${BIN_NAME}
 
 get-deps:
 	dep ensure
@@ -36,7 +36,7 @@ get-deps:
 build-alpine:
 	@echo "building ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
-	go build -ldflags '-w -linkmode external -extldflags "-static" -X gitlab.jiangxingai.com/luyor/tf-pose-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/tf-pose-backend/version.BuildDate=${BUILD_DATE}' -o bin/${BIN_NAME}
+	go build -ldflags '-w -linkmode external -extldflags "-static" -X gitlab.jiangxingai.com/luyor/tf-fence-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/tf-fence-backend/version.BuildDate=${BUILD_DATE}' -o bin/${BIN_NAME}
 
 package:
 	@echo "building image ${BIN_NAME} ${VERSION} $(GIT_COMMIT)"

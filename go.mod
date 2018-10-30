@@ -1,4 +1,4 @@
-module gitlab.jiangxingai.com/luyor/tf-pose-backend
+module gitlab.jiangxingai.com/luyor/tf-fence-backend
 
 require (
 	github.com/Sirupsen/logrus v1.0.6

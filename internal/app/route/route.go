@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/internal/app/controller"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/controller"
 )
 
 // Routes adds routes to http

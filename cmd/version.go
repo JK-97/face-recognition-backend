@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"gitlab.jiangxingai.com/luyor/tf-pose-backend/version"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/version"
 )
 
 // versionCmd represents the version command
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of tf-pose-backend",
-	Long:  `All software has versions. This is tf-pose-backend`,
+	Short: "Print the version number of tf-fence-backend",
+	Long:  `All software has versions. This is tf-fence-backend`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Build Date:", version.BuildDate)
 		fmt.Println("Git Commit:", version.GitCommit)
