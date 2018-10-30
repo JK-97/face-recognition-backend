@@ -36,7 +36,7 @@ func pushEvent(title, device string, labels, detail map[string]string) error {
 	if err != nil {
 		return err
 	}
-	createdTime := time.Now().UnixNano()
+	createdTime := time.Now().Unix()
 
 	e := Event{id.Bytes(), title, labels, createdTime, device, relatedApp, detail}
 
