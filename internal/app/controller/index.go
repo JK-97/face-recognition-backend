@@ -2,19 +2,8 @@ package controller
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
-
-func serveStatic(path string, w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadFile(path)
-	if err != nil {
-		Error500(w, r)
-		return
-	}
-
-	w.Write(body)
-}
 
 // PingGet returns pong
 func PingGet(w http.ResponseWriter, r *http.Request) {

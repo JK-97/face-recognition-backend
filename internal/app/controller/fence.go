@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/model"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/schema"
 )
 
 // FenceGetPost handles Get, Post methods.
@@ -17,7 +18,7 @@ func FenceGetPost(w http.ResponseWriter, r *http.Request) {
 		respondJSON(w, r, fence)
 
 	case http.MethodPost:
-		var fence FencePos
+		var fence schema.FencePos
 		if r.Body == nil {
 			Error500(w, r)
 			return
@@ -27,13 +28,8 @@ func FenceGetPost(w http.ResponseWriter, r *http.Request) {
 			Error500(w, r)
 			return
 		}
-		model.SetFence([4]float32{fence.ymin, fence.xmin, fence.ymax, fence.xmax})
+		model.SetFence(fence)
 	default:
 		Error404(w, r)
 	}
-}
-
-// FencePos is a fence position
-type FencePos struct {
-	ymin, xmin, ymax, xmax float32
 }
