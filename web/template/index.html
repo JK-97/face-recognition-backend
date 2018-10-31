@@ -4,21 +4,27 @@
 </head>
 
 <body>
-	<a href="{{ ApiGatewayAddr }}/ping">test link</a>
-	<div id="player-wrapper"></div>
+	<a href="/setting" 
+		style="
+			position: absolute;
+			z-index: 100;
 
-	
+		">设置</a>
+	<div id="player-wrapper" ></div>
+
 	<script>
 		var player = new Clappr.Player({
-			width: "100%",
 			height: "100%",
-			source: "rtmp://192.168.4.1:30001/live/prison_out",
+			width: "100%",
+			source: "rtmp://localhost:1935/live/prison_out",
 			autoPlay: true,
 			parentId: "#player-wrapper",
 			plugins: {'playback': [RTMP]},
 			rtmpConfig: {
 					playbackType: 'live',
 			},
+			chromeless: true
 		});
-  </script>
+	</script>
+
 </body>

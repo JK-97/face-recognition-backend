@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/schema"
 )
 
 // Provider defines a set of read-only methods for accessing the application
@@ -59,9 +60,8 @@ func readViperConfig(appName string) *viper.Viper {
 	v.SetDefault("event-out-addr", "192.168.3.33:6379")
 	v.SetDefault("event-out-chan", "edge_dashboard_events")
 
-	// fence: ymin, xmin, ymax, xmax
 	// no fence by default
-	v.SetDefault("fence-position", [4]float32{0, 0, 1, 1})
+	v.SetDefault("fence-position", schema.FencePos{Ymin: 0, Xmin: 0, Ymax: 1, Xmax: 1})
 
 	return v
 }
