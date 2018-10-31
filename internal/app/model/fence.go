@@ -1,8 +1,8 @@
 package model
 
 import (
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/config"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 func isOutside(box [4]float32) bool {

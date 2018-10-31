@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/Sirupsen/logrus"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 )
 
 // Logger defines a set of methods for writing application logs. Derived from and

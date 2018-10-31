@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/gomodule/redigo/redis"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/log"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 // fenceMessage is the detection result of tf fence detector

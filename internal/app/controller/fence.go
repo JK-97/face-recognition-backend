@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/model"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 // FenceGetPost handles Get, Post methods.

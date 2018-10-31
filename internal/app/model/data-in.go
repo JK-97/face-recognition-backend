@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/config"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/log"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 // Listen subscribes to messages from redis, and handle the message

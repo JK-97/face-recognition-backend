@@ -3,7 +3,7 @@ package route
 import (
 	"net/http"
 
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/controller"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/controller"
 )
 
 // Routes adds routes to http

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 // Provider defines a set of read-only methods for accessing the application
@@ -39,7 +39,7 @@ func LoadConfigProvider(appName string) Provider {
 }
 
 func init() {
-	defaultConfig = readViperConfig("TF-FENCE-BACKEND")
+	defaultConfig = readViperConfig("FACE-RECOGNITION-BACKEND")
 }
 
 func readViperConfig(appName string) *viper.Viper {
@@ -52,10 +52,10 @@ func readViperConfig(appName string) *viper.Viper {
 	v.SetDefault("json_logs", false)
 	v.SetDefault("loglevel", "debug")
 
-	v.SetDefault("app-name", "tf-fence")
+	v.SetDefault("app-name", "face-recognition")
 
 	v.SetDefault("data-in-addr", "192.168.3.33:6379")
-	v.SetDefault("data-in-chan", "tf-fence")
+	v.SetDefault("data-in-chan", "face-recognition")
 
 	v.SetDefault("event-out-addr", "192.168.3.33:6379")
 	v.SetDefault("event-out-chan", "edge_dashboard_events")
