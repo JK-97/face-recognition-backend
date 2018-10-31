@@ -1,4 +1,4 @@
-# tf-fence-backend
+# face-recognition-backend
 
 A Golang project.
 
@@ -10,7 +10,7 @@ Running it then should be as simple as:
 
 ```console
 $ make
-$ ./bin/tf-fence-backend
+$ ./bin/face-recognition-backend
 ```
 
 ### Testing

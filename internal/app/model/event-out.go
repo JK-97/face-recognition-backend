@@ -6,7 +6,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/satori/go.uuid"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 )
 
 // Event is a dashboard event:

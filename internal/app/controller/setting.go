@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/model"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/internal/app/schema"
-	"gitlab.jiangxingai.com/luyor/tf-fence-backend/log"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 // SettingGETPOST handles Get, Post methods.
