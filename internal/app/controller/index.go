@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -13,6 +14,11 @@ func serveStatic(path string, w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(body)
+}
+
+// PingGet returns pong
+func PingGet(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "pong")
 }
 
 // IndexGET displays the home page
