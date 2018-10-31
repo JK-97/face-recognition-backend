@@ -1,11 +1,11 @@
 package model
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	_ "image/jpeg" // jpeg is imported for its initialization side-effect,
-	// which allows image.Decode to understand JPEG formatted images.
-	"io"
+	"image"
+	"image/jpeg"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -19,7 +19,12 @@ type fenceMessage struct {
 	Timestamp float32
 	Image     string
 	Device    string
-	Output    string
+	Output    []recognition
+}
+
+type recognition struct {
+	// Box: ymin, xmin, ymax, xmax
+	Box [4]float32
 }
 
 func process(msg redis.Message) error {
@@ -31,31 +36,53 @@ func process(msg redis.Message) error {
 
 	go func() {
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data.Image))
-		// img, format, err := image.Decode(reader)
+		img, _, err := image.Decode(reader)
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 
-		// TODO: save file in database to survive from app container removal
-		f, err := ioutil.TempFile("img", "event-*.jpg")
-		if err != nil {
-			log.Fatal(err)
+		for _, rcg := range data.Output {
+			box := rcg.Box
+
+			if isOutside(box) {
+				height, width := float32(img.Bounds().Max.Y), float32(img.Bounds().Max.X)
+				rect := image.Rect(int(box[1]*width), int(box[0]*height), int(box[3]*width), int(box[2]*height))
+				personImg := img.(subImager).SubImage(rect)
+
+				fname := saveImg(personImg)
+				go func() {
+					base := filepath.Base(fname)
+					detail := map[string]string{
+						"image_url": "/img/" + base,
+					}
+
+					err := pushEvent("人员跨越电子围栏", data.Device, nil, detail)
+					if err != nil {
+						log.Warning(err)
+					}
+				}()
+			}
 		}
-		defer f.Close()
-		io.Copy(f, reader)
-
-		go func() {
-			base := filepath.Base(f.Name())
-			detail := map[string]string{
-				"image_url": "/img/" + base,
-			}
-
-			err := pushEvent("test", "device1", nil, detail)
-			if err != nil {
-				log.Warning(err)
-			}
-		}()
 	}()
 
 	return nil
+}
+
+type subImager interface {
+	SubImage(r image.Rectangle) image.Image
+}
+
+// TODO: save file in database to survive from app container removal
+func saveImg(personImg image.Image) string {
+	var imageBuf bytes.Buffer
+	jpeg.Encode(&imageBuf, personImg, nil)
+
+	f, err := ioutil.TempFile("img", "event-*.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	f.Write(imageBuf.Bytes())
+	return f.Name()
 }

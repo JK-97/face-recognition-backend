@@ -29,7 +29,7 @@ type Provider interface {
 
 var defaultConfig *viper.Viper
 
-func Config() Provider {
+func Config() *viper.Viper {
 	return defaultConfig
 }
 
@@ -38,7 +38,7 @@ func LoadConfigProvider(appName string) Provider {
 }
 
 func init() {
-	defaultConfig = readViperConfig("TF-fence-BACKEND")
+	defaultConfig = readViperConfig("TF-FENCE-BACKEND")
 }
 
 func readViperConfig(appName string) *viper.Viper {
@@ -58,6 +58,10 @@ func readViperConfig(appName string) *viper.Viper {
 
 	v.SetDefault("event-out-addr", "192.168.3.33:6379")
 	v.SetDefault("event-out-chan", "edge_dashboard_events")
+
+	// fence: ymin, xmin, ymax, xmax
+	// no fence by default
+	v.SetDefault("fence-position", [4]float32{0, 0, 1, 1})
 
 	return v
 }
