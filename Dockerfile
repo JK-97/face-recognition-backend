@@ -1,9 +1,12 @@
+FROM busybox AS build-env
+RUN touch /empty
+
 FROM scratch
 
 WORKDIR /backend
 COPY ./bin/tf-fence-backend .
 COPY ./web ./web
-RUN mkdir ./img
+COPY --from=build-env /empty /img
 
 ENTRYPOINT [ "/backend/tf-fence-backend" ]
 CMD [ "serve" ]
