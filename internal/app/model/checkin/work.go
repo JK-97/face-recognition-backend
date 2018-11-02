@@ -1,8 +1,10 @@
 package checkin
 
 import (
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 type checkRecordSet map[string]struct{}
@@ -11,7 +13,8 @@ type checkRecordSet map[string]struct{}
 var currentRecord = checkRecordSet{}
 
 func addRcg(rcg schema.Recognition) {
-	if rcg.ID == "unknown" {
+	if model.GetPerson(rcg.ID) == nil {
+		log.Debugf("person detected is not in db, id: %v\n", rcg.ID)
 		return
 	}
 	currentRecord[rcg.ID] = struct{}{}
