@@ -12,11 +12,11 @@ func PingGet(w http.ResponseWriter, r *http.Request) {
 
 // IndexGET displays the home page
 func IndexGET(w http.ResponseWriter, r *http.Request) {
-	serveStatic("web/template/index.html", w, r)
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
 // ImgGET send imgs
 func ImgGET(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/img/"):]
+	title := r.URL.Path[len("/v1/img/"):]
 	serveStatic("img/"+title, w, r)
 }
