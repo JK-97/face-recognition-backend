@@ -2,11 +2,11 @@ package model
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/satori/go.uuid"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal"
 )
 
 // Event is a dashboard event:
@@ -37,7 +37,7 @@ func pushEvent(title, device string, labels, detail map[string]string) error {
 		return err
 	}
 
-	createdTime := time.Now().Unix()
+	createdTime := util.NowMilli()
 
 	e := Event{id.Bytes(), title, labels, createdTime, device, relatedApp, detail}
 

@@ -5,12 +5,20 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
-func respondJSON(w http.ResponseWriter, r *http.Request, obj interface{}) {
+// Error handles server error
+func Error(w http.ResponseWriter, err error, code int) {
+	http.Error(w, http.StatusText(code), code)
+	log.Error(err)
+}
+
+func respondJSON(obj interface{}, w http.ResponseWriter, r *http.Request) {
 	b, err := json.Marshal(obj)
 	if err != nil {
-		Error500(w, r)
+		Error(w, err, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -20,7 +28,7 @@ func respondJSON(w http.ResponseWriter, r *http.Request, obj interface{}) {
 func serveStatic(path string, w http.ResponseWriter, r *http.Request) error {
 	body, err := ioutil.ReadFile(path)
 	if err != nil {
-		Error500(w, r)
+		Error(w, err, http.StatusInternalServerError)
 		return err
 	}
 
@@ -31,19 +39,19 @@ func serveStatic(path string, w http.ResponseWriter, r *http.Request) error {
 func serveTemplate(path string, data interface{}, w http.ResponseWriter, r *http.Request) error {
 	body, err := ioutil.ReadFile(path)
 	if err != nil {
-		Error500(w, r)
+		Error(w, err, http.StatusInternalServerError)
 		return err
 	}
 
 	t, err := template.New(path).Parse(string(body))
 	if err != nil {
-		Error500(w, r)
+		Error(w, err, http.StatusInternalServerError)
 		return err
 	}
 
 	err = t.Execute(w, data)
 	if err != nil {
-		Error500(w, r)
+		Error(w, err, http.StatusInternalServerError)
 		return err
 	}
 

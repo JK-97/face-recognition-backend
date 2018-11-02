@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 // Provider defines a set of read-only methods for accessing the application
@@ -30,10 +29,12 @@ type Provider interface {
 
 var defaultConfig *viper.Viper
 
+// Config returns project config object
 func Config() *viper.Viper {
 	return defaultConfig
 }
 
+// LoadConfigProvider loads the config with appName
 func LoadConfigProvider(appName string) Provider {
 	return readViperConfig(appName)
 }
@@ -54,14 +55,10 @@ func readViperConfig(appName string) *viper.Viper {
 
 	v.SetDefault("app-name", "face-recognition")
 
-	v.SetDefault("data-in-addr", "192.168.3.33:6379")
-	v.SetDefault("data-in-chan", "face-recognition")
+	v.SetDefault("camera-addr", "http://192.168.0.196:8088")
 
-	v.SetDefault("event-out-addr", "192.168.3.33:6379")
-	v.SetDefault("event-out-chan", "edge_dashboard_events")
-
-	// no fence by default
-	v.SetDefault("fence-position", schema.FencePos{Ymin: 0, Xmin: 0, Ymax: 1, Xmax: 1})
+	v.SetDefault("face-ai-record-addr", "http://192.168.0.196:8008/record")
+	v.SetDefault("face-ai-detect-addr", "http://192.168.0.196:8008/detect")
 
 	return v
 }
