@@ -2,7 +2,6 @@ package checkin
 
 import (
 	"fmt"
-	"sync"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
@@ -22,7 +21,6 @@ type Checkiner struct {
 	status  schema.CheckinStatus
 	startCh chan chan error
 	stopCh  chan chan stopRespType
-	once    sync.Once
 }
 
 // Start starts periodical checkin
