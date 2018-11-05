@@ -25,6 +25,9 @@ func Record(personID string, images []string) error {
 	cfg := config.Config()
 	url := cfg.GetString("face-ai-record-addr")
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return err
+	}
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
