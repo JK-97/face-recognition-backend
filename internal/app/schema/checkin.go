@@ -1,11 +1,17 @@
 package schema
 
-// StatusOption is the type of status
-type StatusOption string
+// CheckinStatus is different status type
+type CheckinStatus string
+
+// Options of type CheckinStatus
+const (
+	CHECKING CheckinStatus = "checking"
+	STOPPED  CheckinStatus = "stopped"
+)
 
 // CheckStatusResp is a response of CheckStatusGET
 type CheckStatusResp struct {
-	Status StatusOption `json:"status"`
+	Status CheckinStatus `json:"status"`
 }
 
 // StopCheckinResp is a response of StopCheckinPOST

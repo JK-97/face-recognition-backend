@@ -11,22 +11,22 @@ import (
 )
 
 const (
-	checking schema.StatusOption = "checking"
-	stopped  schema.StatusOption = "stopped"
+	checking schema.CheckinStatus = schema.CHECKING
+	stopped  schema.CheckinStatus = schema.STOPPED
 )
 
-var status = stopped
+var status = schema.STOPPED
 var checkinSeal = make(chan seal)
 var statusMutex = sync.Mutex{}
 var startTime int64
 
 // Status returns checkin status
-func Status() schema.StatusOption {
+func Status() schema.CheckinStatus {
 	return status
 }
 
 // changeStatus changes status, return true if the status is changed
-func changeStatus(newStatus schema.StatusOption) bool {
+func changeStatus(newStatus schema.CheckinStatus) bool {
 	statusMutex.Lock()
 	defer statusMutex.Unlock()
 	if status == newStatus {
