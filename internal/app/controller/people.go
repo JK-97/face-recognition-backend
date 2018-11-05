@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
@@ -38,7 +38,7 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = model.AddPerson(p.Person, p.Images)
+	err = people.AddPerson(p.Person, p.Images)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
@@ -47,7 +47,7 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 
 // CheckinPeopleListGET returns checkin people list
 func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
-	people := model.GetPeople()
+	people := people.GetPeople()
 	respondJSON(people, w, r)
 }
 

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
@@ -32,7 +32,7 @@ func CheckinGET(w http.ResponseWriter, r *http.Request) {
 	details := make([]schema.CheckinPerson, 0, len(history.Record))
 	for id := range history.Record {
 		person := schema.Person{ID: id}
-		dbp := model.GetPerson(id)
+		dbp := people.GetPerson(id)
 		if dbp != nil {
 			person = dbp.Person
 		}

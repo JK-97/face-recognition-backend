@@ -3,7 +3,7 @@ package checkin
 import (
 	"sync"
 
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 )
 
 type seal struct {
@@ -30,7 +30,7 @@ func saveCheckin(s seal) {
 	histories[s.startTime] = &History{
 		StartTime:     s.startTime,
 		EndTime:       s.endTime,
-		ExpectedCount: model.CountPeople(),
+		ExpectedCount: people.CountPeople(),
 		ActualCount:   len(currentRecord),
 		Record:        currentRecord,
 	}
