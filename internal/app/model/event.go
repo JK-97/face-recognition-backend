@@ -6,7 +6,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/satori/go.uuid"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 )
 
 // Event is a dashboard event:

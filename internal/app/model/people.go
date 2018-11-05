@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 
 	"github.com/satori/go.uuid"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 )
 
 var people = map[string]*schema.DBPerson{}
@@ -48,8 +48,8 @@ func AddPerson(p schema.Person, images []string) error {
 		return err
 	}
 
-	img, err := base64Str2Img(images[0])
-	fname := saveImg(img, "profile")
+	img, err := util.Base64Str2Img(images[0])
+	fname := util.SaveImg(img, "profile")
 
 	p.ID = personID
 	dbp := &schema.DBPerson{

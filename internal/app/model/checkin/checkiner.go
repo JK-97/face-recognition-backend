@@ -3,8 +3,8 @@ package checkin
 import (
 	"fmt"
 
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 

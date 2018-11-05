@@ -1,4 +1,4 @@
-package model
+package util
 
 import (
 	"bytes"
@@ -15,8 +15,9 @@ type subImager interface {
 	SubImage(r image.Rectangle) image.Image
 }
 
+// SaveImg saves a image to local dir
 // TODO: save file in database to survive from app container removal
-func saveImg(img *image.Image, suffix string) string {
+func SaveImg(img *image.Image, suffix string) string {
 	var imageBuf bytes.Buffer
 	jpeg.Encode(&imageBuf, *img, nil)
 
@@ -29,7 +30,8 @@ func saveImg(img *image.Image, suffix string) string {
 	return f.Name()
 }
 
-func base64Str2Img(str string) (*image.Image, error) {
+// Base64Str2Img converts base64 image to image.Image
+func Base64Str2Img(str string) (*image.Image, error) {
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(str))
 	img, _, err := image.Decode(reader)
 	if err != nil {
