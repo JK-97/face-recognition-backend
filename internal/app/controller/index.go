@@ -12,6 +12,9 @@ func PingGet(w http.ResponseWriter, r *http.Request) {
 
 // IndexGET displays the home page
 func IndexGET(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/" {
+		serveStatic("web/template/index.html", w, r)
+	}
 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
