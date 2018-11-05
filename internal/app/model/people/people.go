@@ -1,4 +1,4 @@
-package model
+package people
 
 import (
 	"fmt"
