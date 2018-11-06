@@ -39,5 +39,5 @@ func Detect(img string) ([]schema.Recognition, error) {
 	var result schema.DetectFaceResp
 	json.Unmarshal(b, &result)
 
-	return result.Data.Data.Recognitions, nil
+	return result.Data.Recognitions, nil
 }

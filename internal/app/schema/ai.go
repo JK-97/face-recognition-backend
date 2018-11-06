@@ -8,9 +8,7 @@ type DetectFaceReq struct {
 // DetectFaceResp is a response from post /detect request to face ai service
 type DetectFaceResp struct {
 	Data struct {
-		Data struct {
-			Recognitions []Recognition `json:"recognitions"`
-		} `json:"data"`
+		Recognitions []Recognition `json:"recognitions"`
 	} `json:"data"`
 }
 
