@@ -89,7 +89,7 @@ func (c *Checkiner) fetching(startTime int64) {
 				startTime: startTime,
 				endTime:   endTime,
 			})
-			stopResp <- stopRespType{endTime, nil}
+			stopResp <- stopRespType{startTime, nil}
 			return
 		default:
 			err := checkin()

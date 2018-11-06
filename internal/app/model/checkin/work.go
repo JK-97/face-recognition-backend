@@ -1,23 +1,27 @@
 package checkin
 
 import (
+	"fmt"
+
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
-type checkRecordSet map[string]struct{}
-
 // no sync.locker is needed, because saveCheckin() and checkin() are synced
-var currentRecord = checkRecordSet{}
+var currentRecord = schema.CheckinPeopleSet{}
 
-func addRcg(rcg schema.Recognition) {
-	if people.GetPerson(rcg.ID) == nil {
-		log.Debugf("person detected is not in db, id: %v\n", rcg.ID)
-		return
+func addRcg(rcg schema.Recognition) error {
+	person, err := people.GetPerson(rcg.ID)
+	if person == nil {
+		return fmt.Errorf("person detected is not in db, id: %v", rcg.ID)
+	}
+	if err != nil {
+		return err
 	}
 	currentRecord[rcg.ID] = struct{}{}
+	return nil
 }
 
 func checkin() error {
@@ -32,7 +36,10 @@ func checkin() error {
 	}
 
 	for _, rcg := range rcgs {
-		addRcg(rcg)
+		err := addRcg(rcg)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 	return nil

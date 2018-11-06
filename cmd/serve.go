@@ -18,6 +18,7 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/route"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
@@ -33,6 +34,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		model.InitDB()
+
 		go func() {
 			log.Fatal(http.ListenAndServe(":80", route.Routes()))
 		}()

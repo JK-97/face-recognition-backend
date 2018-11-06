@@ -38,7 +38,7 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = people.AddPerson(p.Person, p.Images)
+	err = people.AddPerson(&p.Person, p.Images)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
@@ -47,7 +47,11 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 
 // CheckinPeopleListGET returns checkin people list
 func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
-	people := people.GetPeople()
+	people, err := people.GetPeople(10, 0)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError)
+		return
+	}
 	respondJSON(people, w, r)
 }
 
