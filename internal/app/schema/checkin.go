@@ -32,4 +32,23 @@ type CheckinResp struct {
 }
 
 // CheckinPerson is a person's info in a checkin
-type CheckinPerson struct{ Person }
+type CheckinPerson struct {
+	ID           string `json:"id"`
+	SerialNumber string `json:"serial_number"`
+	Name         string `json:"name"`
+	Location     string `json:"location"`
+	NationalID   string `json:"national_id"`
+	Image        string `json:"image"`
+}
+
+// CheckinPerson gets CheckinPerson from DBPerson
+func (p *DBPerson) CheckinPerson() CheckinPerson {
+	return CheckinPerson{
+		ID:           p.ID,
+		SerialNumber: p.SerialNumber,
+		Name:         p.Name,
+		Location:     p.Location,
+		NationalID:   p.NationalID,
+		Image:        p.Image,
+	}
+}

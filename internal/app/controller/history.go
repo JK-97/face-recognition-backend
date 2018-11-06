@@ -40,16 +40,16 @@ func CheckinGET(w http.ResponseWriter, r *http.Request) {
 
 	details := make([]schema.CheckinPerson, 0, len(history.Record))
 	for _, id := range history.Record {
-		person := schema.Person{ID: id, Name: "unknown"}
+		person := schema.CheckinPerson{ID: id, Name: "unknown"}
 		dbp, err := people.GetPerson(id)
 		if dbp != nil {
-			person = dbp.Person()
+			person = dbp.CheckinPerson()
 		}
 		if err != nil {
 			Error(w, err, http.StatusInternalServerError)
 			return
 		}
-		details = append(details, schema.CheckinPerson{Person: person})
+		details = append(details, person)
 	}
 	data := schema.CheckinResp{
 		Timestamp:     history.StartTime,
