@@ -1,9 +1,13 @@
 package checkin
 
 import (
-	"sync"
+	"context"
 
+	"github.com/mongodb/mongo-go-driver/mongo"
+	"github.com/mongodb/mongo-go-driver/options"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 type seal struct {
@@ -11,48 +15,68 @@ type seal struct {
 	endTime   int64
 }
 
-// History is a checkin record
-type History struct {
-	StartTime     int64
-	EndTime       int64
-	ExpectedCount int
-	ActualCount   int
-	Record        checkRecordSet
+func collection() *mongo.Collection {
+	return model.DB.Collection("checkin-history")
 }
 
-var histories = map[int64]*History{}
-var hisLock sync.RWMutex
+func saveCheckin(s seal) error {
+	expectedCount, err := people.CountPeople()
+	if err != nil {
+		return err
+	}
 
-func saveCheckin(s seal) {
-	hisLock.Lock()
-	defer hisLock.Unlock()
-
-	histories[s.startTime] = &History{
+	h := &schema.CheckinHistory{
 		StartTime:     s.startTime,
 		EndTime:       s.endTime,
-		ExpectedCount: people.CountPeople(),
+		ExpectedCount: expectedCount,
 		ActualCount:   len(currentRecord),
-		Record:        currentRecord,
+		Record:        currentRecord.List(),
 	}
-	currentRecord = checkRecordSet{}
+	_, err = collection().InsertOne(context.Background(), h)
+	if err != nil {
+		return err
+	}
+
+	currentRecord = schema.CheckinPeopleSet{}
+	return nil
 }
 
 // HistoryTimestamps returns all available timestamps for history query
-func HistoryTimestamps() []int64 {
-	hisLock.RLock()
-	defer hisLock.RUnlock()
-
-	timestamps := make([]int64, 0, len(histories))
-	for key := range histories {
-		timestamps = append(timestamps, key)
+func HistoryTimestamps(limit int, skip int) ([]int64, error) {
+	ctx := context.Background()
+	opt := options.Find().
+		SetLimit(int64(limit)).
+		SetSkip(int64(skip)).
+		SetSort(map[string]int{"start_time": -1}).
+		SetProjection(map[string]int{"start_time": 1})
+	cur, err := collection().Find(ctx, nil, opt)
+	if err != nil {
+		return nil, err
 	}
-	return timestamps
+	defer cur.Close(ctx)
+
+	result := make([]int64, 0)
+	for cur.Next(ctx) {
+		t := &struct {
+			StartTime int64 `bson:"start_time"`
+		}{}
+		if err := cur.Decode(t); err != nil {
+			return nil, err
+		}
+		result = append(result, t.StartTime)
+	}
+
+	return result, nil
 }
 
 // GetHistory returns a checkin record with timestamp
-func GetHistory(timestamp int64) *History {
-	hisLock.RLock()
-	defer hisLock.RUnlock()
+func GetHistory(timestamp int64) (*schema.CheckinHistory, error) {
+	doc := collection().FindOne(context.Background(), map[string]int64{"start_time": timestamp})
+	result := &schema.CheckinHistory{}
+	err := doc.Decode(&result)
+	if err != nil {
+		return nil, err
+	}
 
-	return histories[timestamp]
+	return result, nil
 }

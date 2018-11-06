@@ -55,6 +55,8 @@ func readViperConfig(appName string) *viper.Viper {
 
 	v.SetDefault("app-name", "face-recognition")
 
+	v.SetDefault("db-addr", "mongodb://192.168.3.33")
+
 	v.SetDefault("camera-addr", "http://192.168.0.196:8088")
 
 	v.SetDefault("face-ai-record-addr", "http://192.168.0.196:8008/record")

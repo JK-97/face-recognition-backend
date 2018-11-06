@@ -1,38 +1,68 @@
 package people
 
 import (
+	"context"
 	"fmt"
-	"path/filepath"
 
+	"github.com/mongodb/mongo-go-driver/mongo"
+	"github.com/mongodb/mongo-go-driver/options"
 	"github.com/satori/go.uuid"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 )
 
-var people = map[string]*schema.DBPerson{}
+func collection() *mongo.Collection {
+	return model.DB.Collection("people")
+}
 
 // CountPeople counts people in db
-func CountPeople() int {
-	return len(people)
+func CountPeople() (int, error) {
+	num, err := collection().Count(context.Background(), nil)
+	if err != nil {
+		return 0, err
+	}
+	return int(num), nil
 }
 
 // GetPerson get a person by id in db
-func GetPerson(id string) *schema.DBPerson {
-	return people[id]
+func GetPerson(id string) (*schema.DBPerson, error) {
+	doc := collection().FindOne(context.Background(), map[string]string{"_id": id})
+	result := &schema.DBPerson{}
+	err := doc.Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // GetPeople gets list of people in db
-func GetPeople() []*schema.DBPerson {
-	v := make([]*schema.DBPerson, 0, len(people))
-	for _, person := range people {
-		v = append(v, person)
+func GetPeople(limit int, skip int) ([]*schema.DBPerson, error) {
+	ctx := context.Background()
+	opt := options.Find().
+		SetLimit(int64(limit)).
+		SetSkip(int64(skip)).
+		SetSort(map[string]int{"created_time": -1})
+	cur, err := collection().Find(ctx, nil, opt)
+	if err != nil {
+		return nil, err
 	}
-	return v
+	defer cur.Close(ctx)
+
+	result := []*schema.DBPerson{}
+	for cur.Next(ctx) {
+		dbp := &schema.DBPerson{}
+		if err := cur.Decode(dbp); err != nil {
+			return nil, err
+		}
+		result = append(result, dbp)
+	}
+
+	return result, nil
 }
 
 // AddPerson add a person to db
-func AddPerson(p schema.Person, images []string) error {
+func AddPerson(p *schema.Person, images []string) error {
 	if len(images) == 0 {
 		return fmt.Errorf("should send at least one image")
 	}
@@ -48,17 +78,13 @@ func AddPerson(p schema.Person, images []string) error {
 		return err
 	}
 
-	img, err := util.Base64Str2Img(images[0])
-	fname := util.SaveImg(img, "profile")
-
 	p.ID = personID
-	dbp := &schema.DBPerson{
-		Person:         p,
-		CreateTime:     util.NowMilli(),
-		LastUpdateTime: util.NowMilli(),
-		ImageURL:       "/v1/img/" + filepath.Base(fname),
+	dbp := schema.NewDBPerson(p, images[0])
+
+	_, err = collection().InsertOne(context.Background(), dbp)
+	if err != nil {
+		return err
 	}
-	people[p.ID] = dbp
 
 	return nil
 }
