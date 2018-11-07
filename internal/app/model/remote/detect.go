@@ -21,7 +21,7 @@ func Detect(img string) ([]schema.Recognition, error) {
 	}
 
 	cfg := config.Config()
-	url := cfg.GetString("face-ai-detect-addr")
+	url := cfg.GetString("face-ai-addr") + "/detect"
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		return nil, err
