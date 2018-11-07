@@ -18,6 +18,7 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/route"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
@@ -52,7 +53,17 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// serveCmd.PersistentFlags().String("foo", "", "A help for foo")
+	serveCmd.PersistentFlags().String("port", "80", "Port to run Application server on")
+
+	cfg := config.Config()
+	serveCmd.PersistentFlags().String("db-addr", "mongodb://192.168.3.33", "Mongo db server address")
+	cfg.BindPFlag("db-addr", serveCmd.PersistentFlags().Lookup("db-addr"))
+
+	serveCmd.PersistentFlags().String("camera-addr", "http://192.168.0.196:8088", "Camera server address")
+	cfg.BindPFlag("camera-addr", serveCmd.PersistentFlags().Lookup("camera-addr"))
+
+	serveCmd.PersistentFlags().String("face-ai-addr", "http://192.168.0.196:8008", "Face ai server address")
+	cfg.BindPFlag("face-ai-addr", serveCmd.PersistentFlags().Lookup("face-ai-addr"))
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
