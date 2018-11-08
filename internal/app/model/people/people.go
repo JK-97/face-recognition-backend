@@ -88,3 +88,13 @@ func AddPerson(p *schema.Person, images []string) error {
 
 	return nil
 }
+
+// DeletePerson delete a person to db
+func DeletePerson(id string) error {
+	_, err := collection().DeleteOne(context.Background(), map[string]string{"_id": id})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
