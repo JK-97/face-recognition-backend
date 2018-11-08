@@ -3,6 +3,7 @@ package checkin
 import (
 	"fmt"
 
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
@@ -60,7 +61,7 @@ func (c *Checkiner) serve() {
 	for {
 		startTime := c.waitStart()
 		c.status = schema.CHECKING
-		c.fetching(startTime)
+		c.detecting(startTime)
 		c.status = schema.STOPPED
 	}
 }
@@ -70,24 +71,28 @@ func (c *Checkiner) waitStart() int64 {
 		select {
 		case startResp := <-c.startCh:
 			startTime := util.NowMilli()
-			startResp <- nil
-			return startTime
+			ready := remote.CheckDetectAI()
+			if !ready {
+				startResp <- fmt.Errorf("AI module is not ready")
+			} else {
+				startResp <- nil
+				return startTime
+			}
 		case stopResp := <-c.stopCh:
 			stopResp <- stopRespType{0, fmt.Errorf("checkin is not started")}
 		}
 	}
 }
 
-func (c *Checkiner) fetching(startTime int64) {
+func (c *Checkiner) detecting(startTime int64) {
 	for {
 		select {
 		case startResp := <-c.startCh:
 			startResp <- fmt.Errorf("checkin already started")
 		case stopResp := <-c.stopCh:
-			endTime := util.NowMilli()
 			saveCheckin(seal{
 				startTime: startTime,
-				endTime:   endTime,
+				endTime:   util.NowMilli(),
 			})
 			stopResp <- stopRespType{startTime, nil}
 			return

@@ -41,3 +41,17 @@ func Detect(img string) ([]schema.Recognition, error) {
 
 	return result.Data.Recognitions, nil
 }
+
+// CheckDetectAI pings remote ai to check for availbility
+func CheckDetectAI() bool {
+	cfg := config.Config()
+	url := cfg.GetString("face-ai-addr") + "/detect"
+	resp, err := http.Get(url)
+	if err != nil {
+		return false
+	}
+	if resp.StatusCode != http.StatusOK {
+		return false
+	}
+	return true
+}
