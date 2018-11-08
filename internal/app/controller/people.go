@@ -2,9 +2,11 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
@@ -14,7 +16,7 @@ import (
 func FaceRecordsGET(w http.ResponseWriter, r *http.Request) {
 	b, err := remote.Capture()
 	if err != nil {
-		http.Error(w, "cannot capture image", http.StatusInternalServerError)
+		Error(w, err, http.StatusInternalServerError)
 		return
 	}
 	face := schema.FaceRecordsGETResp{
@@ -25,6 +27,11 @@ func FaceRecordsGET(w http.ResponseWriter, r *http.Request) {
 
 // CheckinPeoplePOST adds a person to checkin people list
 func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
+	if checkin.DefaultCheckiner.Status() == schema.CHECKING {
+		Error(w, fmt.Errorf("Cannot add person while checking in"), http.StatusBadRequest)
+		return
+	}
+
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest)
