@@ -9,7 +9,7 @@ COPY ./web ./web
 COPY --from=build-env /empty /img
 
 ENTRYPOINT [ "/backend/face-recognition-backend" ]
-CMD [ "serve" ]
+# CMD [ "serve" ]
 
 # # Build Stage
 # FROM images.jiangxingai.com:5000/face-recognition-backend:1.11 AS build-stage
