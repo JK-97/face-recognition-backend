@@ -25,6 +25,20 @@ func FaceRecordsGET(w http.ResponseWriter, r *http.Request) {
 	respondJSON(face, w, r)
 }
 
+// CheckinPeoplePOSTDELETE handles post and delete
+// POST adds a person to checkin people list
+// DELETE ?id=xxx delete a checkin people
+func CheckinPeoplePOSTDELETE(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		CheckinPeoplePOST(w, r)
+	case http.MethodDelete:
+		CheckinPeopleDELETE(w, r)
+	default:
+		http.NotFound(w, r)
+	}
+}
+
 // CheckinPeoplePOST adds a person to checkin people list
 func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 	if checkin.DefaultCheckiner.Status() == schema.CHECKING {
@@ -46,6 +60,16 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = people.AddPerson(&p.Person, p.Images)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError)
+		return
+	}
+}
+
+// CheckinPeopleDELETE ?id=xxx delete a checkin people
+func CheckinPeopleDELETE(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	err := people.DeletePerson(id)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return

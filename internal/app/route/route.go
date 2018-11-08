@@ -25,7 +25,7 @@ func Routes() http.Handler {
 
 	// people
 	mux.HandleFunc("/api/v1/face_records", controller.FaceRecordsGET)
-	mux.HandleFunc("/api/v1/checkin_people/add", controller.CheckinPeoplePOST)
+	mux.HandleFunc("/api/v1/checkin_people", controller.CheckinPeoplePOSTDELETE)
 	mux.HandleFunc("/api/v1/checkin_people_list", controller.CheckinPeopleListGET)
 	mux.HandleFunc("/api/v1/start_recording", controller.StartRecordingPOST)
 
