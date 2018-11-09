@@ -71,11 +71,9 @@ func (c *Checkiner) waitStart() int64 {
 		select {
 		case startResp := <-c.startCh:
 			startTime := util.NowMilli()
-			ready := remote.CheckDetectAI()
-			if !ready {
-				startResp <- fmt.Errorf("AI module is not ready")
-			} else {
-				startResp <- nil
+			err := remote.CheckDetectAI()
+			startResp <- err
+			if err == nil {
 				return startTime
 			}
 		case stopResp := <-c.stopCh:

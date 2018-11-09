@@ -43,15 +43,15 @@ func Detect(img string) ([]schema.Recognition, error) {
 }
 
 // CheckDetectAI pings remote ai to check for availbility
-func CheckDetectAI() bool {
+func CheckDetectAI() error {
 	cfg := config.Config()
 	url := cfg.GetString("face-ai-addr") + "/detect"
 	resp, err := http.Get(url)
 	if err != nil {
-		return false
+		return schema.HTTPError{Err: err, Code: http.StatusInternalServerError}
 	}
 	if resp.StatusCode != http.StatusOK {
-		return false
+		return schema.HTTPError{Err: fmt.Errorf("model is training"), Code: resp.StatusCode}
 	}
-	return true
+	return nil
 }
