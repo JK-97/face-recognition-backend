@@ -2,13 +2,10 @@ package people
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/options"
-	"github.com/satori/go.uuid"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
@@ -37,13 +34,23 @@ func GetPerson(id string) (*schema.DBPerson, error) {
 }
 
 // GetPeople gets list of people in db
-func GetPeople(limit int, skip int) ([]*schema.DBPerson, error) {
-	ctx := context.Background()
+func GetPeople(ids []string, createdBefore int64, limit int, skip int) ([]*schema.DBPerson, error) {
 	opt := options.Find().
 		SetLimit(int64(limit)).
 		SetSkip(int64(skip)).
 		SetSort(map[string]int{"created_time": -1})
-	cur, err := collection().Find(ctx, nil, opt)
+
+	filter := make(map[string]interface{})
+	if ids != nil {
+		filter["_id"] = map[string][]string{"$in": ids}
+	}
+
+	if createdBefore != 0 {
+		filter["created_time"] = map[string]int64{"$lt": createdBefore}
+	}
+
+	ctx := context.Background()
+	cur, err := collection().Find(ctx, filter, opt)
 	if err != nil {
 		return nil, err
 	}
@@ -59,42 +66,4 @@ func GetPeople(limit int, skip int) ([]*schema.DBPerson, error) {
 	}
 
 	return result, nil
-}
-
-// AddPerson add a person to db
-func AddPerson(p *schema.Person, images []string) error {
-	if len(images) == 0 {
-		return fmt.Errorf("should send at least one image")
-	}
-
-	uuid, err := uuid.NewV1()
-	if err != nil {
-		return err
-	}
-	personID := uuid.String()
-
-	err = remote.Record(personID, images)
-	if err != nil {
-		return err
-	}
-
-	p.ID = personID
-	dbp := schema.NewDBPerson(p, images[0])
-
-	_, err = collection().InsertOne(context.Background(), dbp)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// DeletePerson delete a person to db
-func DeletePerson(id string) error {
-	_, err := collection().DeleteOne(context.Background(), map[string]string{"_id": id})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

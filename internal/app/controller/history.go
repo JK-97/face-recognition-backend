@@ -30,33 +30,39 @@ func CheckinGET(w http.ResponseWriter, r *http.Request) {
 
 	history, err := checkin.GetHistory(int64(t))
 	if err != nil {
-		Error(w, err, http.StatusBadRequest)
+		Error(w, err, http.StatusInternalServerError)
 		return
 	}
 	if history == nil {
-		http.Error(w, "requested checkin data is not available", http.StatusBadRequest)
+		Error(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	details := make([]schema.CheckinPerson, 0, len(history.Record))
-	for _, id := range history.Record {
-		person := schema.CheckinPerson{ID: id, Name: "unknown"}
-		dbp, err := people.GetPerson(id)
-		if dbp != nil {
-			person = dbp.CheckinPerson()
-		}
-		if err != nil {
-			Error(w, err, http.StatusInternalServerError)
-			return
-		}
-		details = append(details, person)
+	present, err := people.GetPeople(history.Record, 0, 10, 0)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError)
 	}
+
+	absent, err := people.GetPeople(history.Record, 0, 10, 0)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError)
+	}
+
 	data := schema.CheckinResp{
 		Timestamp:     history.StartTime,
 		CostTime:      history.EndTime - history.StartTime,
 		ExpectedCount: history.ExpectedCount,
 		ActualCount:   history.ActualCount,
-		Detail:        details,
+		Present:       dB2CheckinPeople(present),
+		Absent:        dB2CheckinPeople(absent),
 	}
 	respondJSON(data, w, r)
+}
+
+func dB2CheckinPeople(l []*schema.DBPerson) []*schema.CheckinPerson {
+	res := make([]*schema.CheckinPerson, len(l))
+	for i, p := range l {
+		res[i] = p.CheckinPerson()
+	}
+	return res
 }
