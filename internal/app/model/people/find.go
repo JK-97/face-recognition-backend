@@ -33,21 +33,27 @@ func GetPerson(id string) (*schema.DBPerson, error) {
 	return result, nil
 }
 
+// NewFilterPresent creates a filter for present people in checkin
+func NewFilterPresent(idsIn []string) map[string]interface{} {
+	filter := make(map[string]interface{})
+	filter["_id"] = map[string][]string{"$in": idsIn}
+	return filter
+}
+
+// NewFilterAbsent creates a filter for absent people in checkin
+func NewFilterAbsent(idsNotIn []string, createdBefore int64) map[string]interface{} {
+	filter := make(map[string]interface{})
+	filter["_id"] = map[string][]string{"$nin": idsNotIn}
+	filter["created_time"] = map[string]int64{"$lt": createdBefore}
+	return filter
+}
+
 // GetPeople gets list of people in db
-func GetPeople(ids []string, createdBefore int64, limit int, skip int) ([]*schema.DBPerson, error) {
+func GetPeople(filter map[string]interface{}, limit int, skip int) ([]*schema.DBPerson, error) {
 	opt := options.Find().
 		SetLimit(int64(limit)).
 		SetSkip(int64(skip)).
 		SetSort(map[string]int{"created_time": -1})
-
-	filter := make(map[string]interface{})
-	if ids != nil {
-		filter["_id"] = map[string][]string{"$in": ids}
-	}
-
-	if createdBefore != 0 {
-		filter["created_time"] = map[string]int64{"$lt": createdBefore}
-	}
 
 	ctx := context.Background()
 	cur, err := collection().Find(ctx, filter, opt)
