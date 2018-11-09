@@ -6,11 +6,16 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 // Error handles server error
 func Error(w http.ResponseWriter, err error, code int) {
+	if h, ok := err.(schema.HTTPError); ok {
+		code = h.Code
+	}
+
 	http.Error(w, http.StatusText(code), code)
 	log.Error(err)
 }
