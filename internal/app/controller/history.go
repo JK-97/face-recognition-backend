@@ -38,12 +38,12 @@ func CheckinGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	present, err := people.GetPeople(history.Record, 0, 10, 0)
+	present, err := people.GetPeople(people.NewFilterPresent(history.Record), 10, 0)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 	}
 
-	absent, err := people.GetPeople(history.Record, 0, 10, 0)
+	absent, err := people.GetPeople(people.NewFilterAbsent(history.Record, int64(t)), 10, 0)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 	}

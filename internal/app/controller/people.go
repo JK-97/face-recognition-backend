@@ -78,7 +78,7 @@ func CheckinPeopleDELETE(w http.ResponseWriter, r *http.Request) {
 
 // CheckinPeopleListGET returns checkin people list
 func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
-	people, err := people.GetPeople(nil, 0, 10, 0)
+	people, err := people.GetPeople(nil, 10, 0)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
