@@ -11,7 +11,7 @@ import (
 
 // CheckinHistoryGET get checkin history timestamps
 func CheckinHistoryGET(w http.ResponseWriter, r *http.Request) {
-	ts, err := checkin.HistoryTimestamps(10, 0)
+	ts, err := checkin.HistoryTimestamps(0, 0)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest)
 		return
@@ -38,12 +38,12 @@ func CheckinGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	present, err := people.GetPeople(people.NewFilterPresent(history.Record), 10, 0)
+	present, err := people.GetPeople(people.NewFilterPresent(history.Record), 0, 0)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 	}
 
-	absent, err := people.GetPeople(people.NewFilterAbsent(history.Record, int64(t)), 10, 0)
+	absent, err := people.GetPeople(people.NewFilterAbsent(history.Record, int64(t)), 0, 0)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 	}
