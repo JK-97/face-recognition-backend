@@ -42,7 +42,7 @@ package:
 	@echo "building image ${BIN_NAME} ${VERSION} $(GIT_COMMIT)"
 	docker build -t $(IMAGE_NAME):local .
 
-tag: 
+tag: package
 	@echo "Tagging: latest ${VERSION} $(GIT_COMMIT)"
 	docker tag $(IMAGE_NAME):local $(IMAGE_NAME):latest
 
