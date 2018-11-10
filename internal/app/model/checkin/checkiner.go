@@ -2,6 +2,7 @@ package checkin
 
 import (
 	"fmt"
+	"time"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
@@ -83,6 +84,9 @@ func (c *Checkiner) waitStart() int64 {
 }
 
 func (c *Checkiner) detecting(startTime int64) {
+	ticker := time.NewTicker(500 * time.Millisecond)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case startResp := <-c.startCh:
@@ -95,10 +99,12 @@ func (c *Checkiner) detecting(startTime int64) {
 			stopResp <- stopRespType{startTime, nil}
 			return
 		default:
+			<-ticker.C
 			err := checkin()
 			if err != nil {
 				log.Error(err)
 			}
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 }
