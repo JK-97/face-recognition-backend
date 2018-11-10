@@ -104,7 +104,6 @@ func (c *Checkiner) detecting(startTime int64) {
 			if err != nil {
 				log.Error(err)
 			}
-			time.Sleep(500 * time.Millisecond)
 		}
 	}
 }
