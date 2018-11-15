@@ -21,6 +21,7 @@ type Recognition struct {
 		Ymax int
 		Xmax int
 	} `json:"position"`
+	Confidence float32 `json:"confidence"`
 }
 
 // RecordReq is a post /record request to face ai service
