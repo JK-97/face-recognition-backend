@@ -19,18 +19,29 @@ func collection() *mongo.Collection {
 	return model.DB.Collection("checkin-history")
 }
 
+func list(s *schema.CheckinPeopleSet, countThres int) []string {
+	l := make([]string, 0)
+	for k, v := range *s {
+		if v >= countThres {
+			l = append(l, k)
+		}
+	}
+	return l
+}
+
 func saveCheckin(s seal) error {
 	expectedCount, err := people.CountPeople()
 	if err != nil {
 		return err
 	}
 
+	l := list(&currentRecord, countThres)
 	h := &schema.CheckinHistory{
 		StartTime:     s.startTime,
 		EndTime:       s.endTime,
 		ExpectedCount: expectedCount,
-		ActualCount:   len(currentRecord),
-		Record:        currentRecord.List(),
+		ActualCount:   len(l),
+		Record:        l,
 	}
 	_, err = collection().InsertOne(context.Background(), h)
 	if err != nil {
