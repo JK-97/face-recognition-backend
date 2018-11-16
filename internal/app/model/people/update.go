@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
@@ -15,7 +15,7 @@ func AddPerson(p *schema.Person, images []string) error {
 		return fmt.Errorf("should send at least one image")
 	}
 
-	uuid, err := uuid.NewV1()
+	uuid, err := uuid.NewUUID()
 	if err != nil {
 		return err
 	}
