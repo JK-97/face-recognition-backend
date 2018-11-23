@@ -21,6 +21,7 @@ type DBPerson struct {
 	CreateTime     int64  `json:"created_time" bson:"created_time"`
 	LastUpdateTime int64  `json:"last_update_time" bson:"last_update_time"`
 	Image          string `json:"image" bson:"image"`
+	ImageURL       string `json:"image_url" bson:"image_url"`
 }
 
 // NewDBPerson creates DBPerson with Person
@@ -34,6 +35,20 @@ func NewDBPerson(p *Person, image string) *DBPerson {
 		CreateTime:     util.NowMilli(),
 		LastUpdateTime: util.NowMilli(),
 		Image:          image,
+	}
+}
+
+// NewDBPersonWithImageURL append url image url
+func NewDBPersonWithImageURL(p *DBPerson) *DBPerson {
+	return &DBPerson{
+		ID:             p.ID,
+		SerialNumber:   p.SerialNumber,
+		Name:           p.Name,
+		Location:       p.Location,
+		NationalID:     p.NationalID,
+		CreateTime:     p.CreateTime,
+		LastUpdateTime: p.LastUpdateTime,
+		ImageURL:       "/api/v1/checkin_people_image?id=" + p.ID,
 	}
 }
 

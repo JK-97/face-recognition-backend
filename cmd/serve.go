@@ -38,7 +38,8 @@ to quickly create a Cobra application.`,
 		model.InitDB()
 
 		go func() {
-			log.Fatal(http.ListenAndServe(":80", route.Routes()))
+			port, _ := cmd.Flags().GetString("port")
+			log.Fatal(http.ListenAndServe(":" + port, route.Routes()))
 		}()
 
 		forever := make(chan struct{})
@@ -64,6 +65,12 @@ func init() {
 
 	serveCmd.PersistentFlags().String("face-ai-addr", "http://192.168.0.196:8008", "Face ai server address")
 	cfg.BindPFlag("face-ai-addr", serveCmd.PersistentFlags().Lookup("face-ai-addr"))
+
+    serveCmd.PersistentFlags().String("login_type", "local", "Login type: local or gateway")
+	cfg.BindPFlag("login_type", serveCmd.PersistentFlags().Lookup("login_type"))
+
+    serveCmd.PersistentFlags().String("apigateway-addr", "http://192.168.0.196:8008", "APIGateway server address")
+	cfg.BindPFlag("apigateway-addr", serveCmd.PersistentFlags().Lookup("apigateway-addr"))
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/exclude_record"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
@@ -14,7 +15,8 @@ import (
 
 // FaceRecordsGET returns one captured image
 func FaceRecordsGET(w http.ResponseWriter, r *http.Request) {
-	b, err := remote.Capture()
+	deviceName := r.URL.Query().Get("device_name")
+	b, err := remote.Capture(deviceName)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
@@ -78,14 +80,41 @@ func CheckinPeopleDELETE(w http.ResponseWriter, r *http.Request) {
 
 // CheckinPeopleListGET returns checkin people list
 func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
+	exclude := r.URL.Query().Get("exclude")
+
 	people, err := people.GetPeople(nil, 0, 0)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
 	}
-	respondJSON(people, w, r)
+
+	var excludePeoples = make(map[string]int64)
+	if exclude != "" {
+		excludePeoples, err = exclude_record.GetExcludePeopleSetNow()
+	}
+
+	var peopleRet = []*schema.DBPerson{}
+	for _, p := range people {
+		if _, ok := excludePeoples[p.NationalID]; !ok {
+			peopleRet = append(peopleRet, p)	
+		}
+	}
+
+	respondJSON(peopleRet, w, r)
 }
 
 // StartRecordingPOST returns ok if ready to capture images
 func StartRecordingPOST(w http.ResponseWriter, r *http.Request) {
+}
+
+// CheckinPeopleImageGET returns people image by id
+func CheckinPeopleImageGET(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	var ids = []string{id}
+	present, err := people.GetPeople(people.NewFilterPresent(ids), 0, 0)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError)
+		return
+	}
+	respondJSON(present, w, r)
 }
