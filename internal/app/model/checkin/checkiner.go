@@ -13,6 +13,8 @@ import (
 // DefaultCheckiner is the singleton of Checkiner
 var DefaultCheckiner = NewCheckiner()
 
+var checkinID int64
+
 type stopRespType struct {
 	time int64
 	err  error
@@ -26,15 +28,20 @@ type Checkiner struct {
 }
 
 // Start starts periodical checkin
-func (c *Checkiner) Start() error {
+func (c *Checkiner) Start() (int64, error) {
 	respCh := make(chan error)
 	c.startCh <- respCh
 	err := <-respCh
-	return err
+	checkinID = util.NowMilli()
+	return checkinID, err
 }
 
 // Stop stops periodical checkin
-func (c *Checkiner) Stop() (int64, error) {
+func (c *Checkiner) Stop(id int64) (int64, error) {
+	if id != 0 && id != checkinID {
+		return 0, fmt.Errorf("checkin was stopped")
+	}
+
 	respCh := make(chan stopRespType)
 	c.stopCh <- respCh
 	resp := <-respCh
