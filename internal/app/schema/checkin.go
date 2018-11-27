@@ -24,12 +24,13 @@ type CheckinHistoryResp []int64
 
 // CheckinResp is a response of CheckinGET
 type CheckinResp struct {
-	Timestamp     int64            `json:"timestamp"`
-	CostTime      int64            `json:"cost_time"`
-	ExpectedCount int              `json:"expected_count"`
-	ActualCount   int              `json:"actual_count"`
-	Present       []*CheckinPerson `json:"present"`
-	Absent        []*CheckinPerson `json:"absent"`
+	Timestamp     int64                 `json:"timestamp"`
+	CostTime      int64                 `json:"cost_time"`
+	ExpectedCount int                   `json:"expected_count"`
+	ActualCount   int                   `json:"actual_count"`
+	Present       []*CheckinPerson      `json:"present"`
+	Absent        []*CheckinPerson      `json:"absent"`
+    ExcludeRecord []*DBExcludeRecord    `json:"exclude_record"`
 }
 
 // CheckinPerson is a person's info in a checkin

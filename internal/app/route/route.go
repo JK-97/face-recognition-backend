@@ -25,26 +25,33 @@ func Routes() http.Handler {
 
 	// people
 	mux.HandleFunc("/api/v1/face_records", controller.FaceRecordsGET)
-	mux.HandleFunc("/api/v1/checkin_people", controller.CheckinPeoplePOSTDELETE)
+	mux.HandleFunc("/api/v1/checkin_people", controller.CheckinPeoplePOSTDELETEGETPUT)
 	mux.HandleFunc("/api/v1/checkin_people_list", controller.CheckinPeopleListGET) // ?exclude=1
 	mux.HandleFunc("/api/v1/start_recording", controller.StartRecordingPOST)
 
-	// TODO
 	// camera
 	mux.HandleFunc("/api/v1/cameras", controller.CamerasGETPOST)
 	// GET [{"name": "", "rtmp": "", "device_name": ""}]
 	// POST {"name": "rtmp": ""}
+
 	// exclude people
 	mux.HandleFunc("/api/v1/exclude_record", controller.ExcludeRecordGETPOSTPUT)
 	// POST {"peoples": [{}, {}"], reason: ""}
 	// GET response: [{"peoples": [{}, {}}], exclude_time: "", reason: "", id: "", include_time: }, ] query args: exclude=1&skip=0&limit=10
 	// PUT query args id=
+
 	// get image
 	mux.HandleFunc("/api/v1/checkin_people_image", controller.CheckinPeopleImageGET) // ?id=
 	// GET response [{}]
+
 	// login
 	mux.HandleFunc("/api/v1/login", controller.LoginPOST)
 	// POST {"username": "", "password": "md5passwd"}
+
+    // settings 
+	mux.HandleFunc("/api/v1/settings", controller.SettingsPOSTGET)
+    // POST {"starttime": {"hour":, "minute":, "second"}, "endtime": {"hour":, "minute": "second"}, "interval": seconds}
+    // GET {"starttime": {"hour":, "minute":, "second"}, "endtime": {"hour":, "minute": "second"}, "interval": seconds}
 
 	mux.HandleFunc("/", controller.IndexGET)
 

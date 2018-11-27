@@ -26,6 +26,39 @@ func NewFilterExclude(excludeTime int64, includeBack bool) map[string]interface{
 	return filter
 }
 
+// NewFilterExclude creates a filter for exclude record in exclude_record at timestmap
+func NewFilterExcludeHistory(timestamp int64) map[string]interface{} {
+
+    type Et struct {
+        Gt int64 `json:"$gt" bson:"$gt"`
+    }
+    type It struct {
+        Lt int64 `json:"$lt" bson:"$lt"`
+        Eq int64 `json:"$eq" bson:"$eq"`
+    }
+    type HistoryFilter []struct {
+        ExcludeTime Et     `json:"exclude_time" bson:"exclude_time"`
+        IncludeTime []It   `json:"include_time" bson:"include_time"`
+    }
+
+    var vf = HistoryFilter {
+        {
+            ExcludeTime: Et {
+                Gt: timestamp,
+            },
+        }, {
+            IncludeTime:[]It{
+                It{Lt: timestamp},
+                It{Eq: -1},
+            },
+        },
+    }
+
+    filter := make(map[string]interface{}) 
+    filter["$and"] = vf
+    return filter
+}
+
 // GetExcludeRecord gets list of exclude record in db
 func GetExcludeRecord(filter map[string]interface{}, limit int, skip int) ([]*schema.DBExcludeRecord, error) {
 	ctx := context.Background()

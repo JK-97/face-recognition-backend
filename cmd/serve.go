@@ -21,6 +21,7 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/route"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/timer"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
@@ -40,6 +41,10 @@ to quickly create a Cobra application.`,
 		go func() {
 			port, _ := cmd.Flags().GetString("port")
 			log.Fatal(http.ListenAndServe(":" + port, route.Routes()))
+		}()
+
+		go func() {
+			timer.RunTimer()	
 		}()
 
 		forever := make(chan struct{})

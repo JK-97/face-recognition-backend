@@ -30,19 +30,21 @@ func AddPerson(p *schema.Person, images []string) error {
 	dbp := schema.NewDBPerson(p, images[0])
 
 	_, err = collection().InsertOne(context.Background(), dbp)
-	if err != nil {
-		return err
-	}
+    return err
+}
 
-	return nil
+// UpdatePerson update a person in db
+func UpdatePerson(p *schema.Person, images []string) error {
+	if len(images) == 0 {
+		return fmt.Errorf("should send at least one image")
+	}
+	updater := schema.NewDBPerson(p, images[0])
+	_, err := collection().UpdateOne(context.Background(), map[string]string{"_id": p.ID}, updater)
+    return err
 }
 
 // DeletePerson delete a person to db
 func DeletePerson(id string) error {
 	_, err := collection().DeleteOne(context.Background(), map[string]string{"_id": id})
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
