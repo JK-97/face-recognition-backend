@@ -25,6 +25,41 @@ func addRcg(rcg schema.Recognition) {
 	}
 }
 
+func list(s *schema.CheckinPeopleSet, countThres int) []string {
+	l := make([]string, 0)
+	for k, v := range *s {
+		if v >= countThres {
+			l = append(l, k)
+		}
+	}
+	return l
+}
+
+func GetCurrentPeopleSet(reset bool) []string {
+	recordMutex.Lock()
+	l := list(&currentRecord, countThres)
+	if reset {
+		currentRecord = schema.CheckinPeopleSet{}
+	}
+	recordMutex.Unlock()
+	return l
+}
+
+// LoadHistoryResult load history checkin recordset into memory
+func LoadHistoryResult(t int64) error {
+	h, err := GetHistory(t)
+	if err != nil {
+		return err
+	}
+	recordMutex.Lock()
+	currentRecord = schema.CheckinPeopleSet{}
+	for _, v := range h.Record {
+		currentRecord[v] = countThres
+	}
+	recordMutex.Unlock()
+	return nil
+}
+
 func checkin() error {
 
 	devices, _ := device.GetCameras()

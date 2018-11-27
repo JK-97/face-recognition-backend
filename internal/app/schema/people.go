@@ -9,6 +9,7 @@ type Person struct {
 	Name         string `json:"name"`
 	Location     string `json:"location"`
 	NationalID   string `json:"national_id"`
+    Group        string `json:"group"`
 }
 
 // DBPerson represents a person in db
@@ -22,6 +23,7 @@ type DBPerson struct {
 	LastUpdateTime int64  `json:"last_update_time" bson:"last_update_time"`
 	Image          string `json:"image" bson:"image"`
 	ImageURL       string `json:"image_url" bson:"image_url"`
+    Group          string `json:"group" bson:"group"`
 }
 
 // NewDBPerson creates DBPerson with Person
@@ -32,6 +34,7 @@ func NewDBPerson(p *Person, image string) *DBPerson {
 		Name:           p.Name,
 		Location:       p.Location,
 		NationalID:     p.NationalID,
+        Group:          p.Group,
 		CreateTime:     util.NowMilli(),
 		LastUpdateTime: util.NowMilli(),
 		Image:          image,
@@ -48,6 +51,7 @@ func NewDBPersonWithImageURL(p *DBPerson) *DBPerson {
 		NationalID:     p.NationalID,
 		CreateTime:     p.CreateTime,
 		LastUpdateTime: p.LastUpdateTime,
+        Group:          p.Group,
 		ImageURL:       "/api/v1/checkin_people_image?id=" + p.ID,
 	}
 }
@@ -60,6 +64,7 @@ func (p *DBPerson) Person() Person {
 		Name:         p.Name,
 		Location:     p.Location,
 		NationalID:   p.NationalID,
+        Group:        p.Group,
 	}
 }
 

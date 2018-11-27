@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
@@ -15,6 +16,20 @@ func CheckStatusGET(w http.ResponseWriter, r *http.Request) {
 
 // StartCheckinPOST starts check in
 func StartCheckinPOST(w http.ResponseWriter, r *http.Request) {
+	tString := r.URL.Query().Get("base")
+	if tString != "" {
+		t, err := strconv.Atoi(tString)
+		if err != nil {
+			Error(w, err, http.StatusBadRequest)
+			return
+		}
+		err = checkin.LoadHistoryResult(int64(t))
+		if err != nil {
+			Error(w, err, http.StatusInternalServerError)
+			return
+		}
+	}
+
 	err := checkin.DefaultCheckiner.Start()
 	if err != nil {
 		Error(w, err, http.StatusBadRequest)
