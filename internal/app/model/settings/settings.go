@@ -74,14 +74,15 @@ func AutoCheckinTimer() (int64, error) {
             last = int64((nowSeconds - start) / s.Interval) * s.Interval
 
             // TODO maybe need try more time
-	        err = checkin.DefaultCheckiner.Start()
-            waitTimer := time.NewTimer(30 * time.Second)
-            go func() {
-                <- waitTimer.C
-                t, err := checkin.DefaultCheckiner.Stop()
-                log.Info("AutoCheckTimer: %ld: ", t, err)
-            } ()
-
+            id, err := checkin.DefaultCheckiner.Start()
+            if err == nil {
+                waitTimer := time.NewTimer(30 * time.Second)
+                go func() {
+                    <- waitTimer.C
+                    t, err := checkin.DefaultCheckiner.Stop(id)
+                    log.Info("AutoCheckTimer: %ld: ", t, err)
+                } ()
+            }
         }
 
         if nowSeconds + s.Interval > 86400 {

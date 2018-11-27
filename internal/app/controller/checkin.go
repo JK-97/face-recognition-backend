@@ -30,7 +30,7 @@ func StartCheckinPOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err := checkin.DefaultCheckiner.Start()
+	_, err := checkin.DefaultCheckiner.Start()
 	if err != nil {
 		Error(w, err, http.StatusBadRequest)
 		return
@@ -39,7 +39,7 @@ func StartCheckinPOST(w http.ResponseWriter, r *http.Request) {
 
 // StopCheckinPOST stops check in
 func StopCheckinPOST(w http.ResponseWriter, r *http.Request) {
-	t, err := checkin.DefaultCheckiner.Stop()
+	t, err := checkin.DefaultCheckiner.Stop(0)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest)
 		return
