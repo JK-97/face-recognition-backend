@@ -3,12 +3,12 @@ package controller
 import (
 	"net/http"
 	"strconv"
+    "fmt"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/exclude_record"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 )
 
 // CheckinHistoryGET get checkin history timestamps
@@ -23,17 +23,24 @@ func CheckinHistoryGET(w http.ResponseWriter, r *http.Request) {
 
 // CheckinGETCurrent returns result in memory
 func CheckinGETCurrent(w http.ResponseWriter, r *http.Request) {
-    t := util.NowMilli()
-    record := checkin.GetCurrentPeopleSet(false)
+    t := checkin.CheckinID
+    status := checkin.DefaultCheckiner.Status()
+
+    if t == 0 {
+		Error(w, fmt.Errorf("no checkin result"), http.StatusNotFound)
+        return 
+    }
+
+    record := checkin.GetCurrentPeopleSet()
     data, err := CheckinResult(&record, t)
     if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
     }
 
-    // data.Timestamp      = history.StartTime
-    // data.CostTime       = history.EndTime - history.StartTime
+    data.Timestamp          = t 
 	data.ExpectedCount, err = people.CountPeople()
+    data.Status             = status
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
@@ -41,7 +48,6 @@ func CheckinGETCurrent(w http.ResponseWriter, r *http.Request) {
 
 	respondJSON(data, w, r)
 }
-
 
 // CheckinGETHistory returns result in db
 func CheckinGETHistory(w http.ResponseWriter, r *http.Request, t int64) {
@@ -63,6 +69,7 @@ func CheckinGETHistory(w http.ResponseWriter, r *http.Request, t int64) {
     data.Timestamp      = history.StartTime
     data.CostTime       = history.EndTime - history.StartTime
     data.ExpectedCount  = history.ExpectedCount
+    data.Status         = schema.STOPPED
 
 	respondJSON(data, w, r)
 }

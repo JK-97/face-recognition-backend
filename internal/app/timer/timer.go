@@ -44,7 +44,7 @@ func (h *JobQueue) LastTimestamp() time.Duration {
 }
 
 var checkTimer *time.Timer
-var handlerQueue *JobQueue
+var handlerQueue = &JobQueue{}
 var timerMutex = &sync.Mutex{}
 
 // RunTimer run timer

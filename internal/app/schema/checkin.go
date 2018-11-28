@@ -31,6 +31,7 @@ type CheckinResp struct {
 	Present       []*CheckinPerson      `json:"present"`
 	Absent        []*CheckinPerson      `json:"absent"`
     ExcludeRecord []*DBExcludeRecord    `json:"exclude_record"`
+    Status        CheckinStatus         `json:"status"`
 }
 
 // CheckinPerson is a person's info in a checkin
