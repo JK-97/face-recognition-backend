@@ -17,23 +17,29 @@ func CheckStatusGET(w http.ResponseWriter, r *http.Request) {
 // StartCheckinPOST starts check in
 func StartCheckinPOST(w http.ResponseWriter, r *http.Request) {
 	tString := r.URL.Query().Get("base")
+    t := 0
+    var err error
 	if tString != "" {
-		t, err := strconv.Atoi(tString)
+		t, err = strconv.Atoi(tString)
 		if err != nil {
 			Error(w, err, http.StatusBadRequest)
 			return
 		}
+    }
+
+	_, err = checkin.DefaultCheckiner.Start()
+	if err != nil {
+		Error(w, err, http.StatusBadRequest)
+		return
+	}
+
+    if t != 0 {
 		err = checkin.LoadHistoryResult(int64(t))
 		if err != nil {
 			Error(w, err, http.StatusInternalServerError)
 			return
 		}
-	}
-
-	_, err := checkin.DefaultCheckiner.Start()
-	if err != nil {
-		Error(w, err, http.StatusBadRequest)
-		return
+        checkin.DefaultCheckiner.Stop(0)
 	}
 }
 

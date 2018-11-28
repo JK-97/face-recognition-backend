@@ -25,7 +25,7 @@ func saveCheckin(s seal) error {
 		return err
 	}
     
-    l := GetCurrentPeopleSet(true)
+    l := GetCurrentPeopleSet()
 	h := &schema.CheckinHistory{
 		StartTime:     s.startTime,
 		EndTime:       s.endTime,

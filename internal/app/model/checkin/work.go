@@ -35,12 +35,15 @@ func list(s *schema.CheckinPeopleSet, countThres int) []string {
 	return l
 }
 
-func GetCurrentPeopleSet(reset bool) []string {
+func ResetCurrentPeopleSet() {
+	recordMutex.Lock()
+	currentRecord = schema.CheckinPeopleSet{}
+	recordMutex.Unlock()
+}
+
+func GetCurrentPeopleSet() []string {
 	recordMutex.Lock()
 	l := list(&currentRecord, countThres)
-	if reset {
-		currentRecord = schema.CheckinPeopleSet{}
-	}
 	recordMutex.Unlock()
 	return l
 }
@@ -52,7 +55,6 @@ func LoadHistoryResult(t int64) error {
 		return err
 	}
 	recordMutex.Lock()
-	currentRecord = schema.CheckinPeopleSet{}
 	for _, v := range h.Record {
 		currentRecord[v] = countThres
 	}
@@ -61,7 +63,6 @@ func LoadHistoryResult(t int64) error {
 }
 
 func checkin() error {
-
 	devices, _ := device.GetCameras()
 
 	for _, d := range devices {
