@@ -2,6 +2,7 @@ package device
 
 import (
 	"context"
+	"github.com/google/uuid"
 
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
@@ -35,6 +36,8 @@ func GetCameras() ([]*schema.Camera, error) {
 
 // AddCamera create camera in db
 func AddCamera(h *schema.Camera) error {
-	_, err := collection().InsertOne(context.Background(), h)
+	uid, err := uuid.NewUUID()
+    h.ID = uid.String()
+	_, err = collection().InsertOne(context.Background(), h)
 	return err
 }

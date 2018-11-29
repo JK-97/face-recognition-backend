@@ -99,9 +99,9 @@ func GetExcludePeopleSet(filter map[string]interface{}, limit int, skip int) (ma
 	}
 	for index := 0; index < len(records); index++ {
 		excludeTime := records[index].ExcludeTime
-		peoples := records[index].Peoples
-		for i := 0; i < len(peoples); i++ {
-			result[peoples[i].NationalID] = excludeTime
+		people := records[index].People
+		for i := 0; i < len(people); i++ {
+			result[people[i].NationalID] = excludeTime
 		}
 
 	}

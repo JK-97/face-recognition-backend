@@ -64,14 +64,14 @@ func ExcludeRecordPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	peoples, err := exclude_record.GetExcludePeopleSetNow()
+	people, err := exclude_record.GetExcludePeopleSetNow()
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	for _, r := range excludeRecord.Peoples {
-		if _, ok := peoples[r.NationalID]; ok {
+	for _, r := range excludeRecord.People {
+		if _, ok := people[r.NationalID]; ok {
 			Error(w, err, http.StatusNotAcceptable)
 			return
 		}

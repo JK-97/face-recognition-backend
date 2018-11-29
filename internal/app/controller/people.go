@@ -62,7 +62,6 @@ func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
     }
 
 	fullImage := r.URL.Query().Get("full_images")
-
     resp := schema.CheckinPeoplePOSTReq{
         Person: dbPerson.Person(),
     }
@@ -165,14 +164,14 @@ func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var excludePeoples = make(map[string]int64)
+	var excludePeople = make(map[string]int64)
 	if exclude != "" {
-		excludePeoples, err = exclude_record.GetExcludePeopleSetNow()
+		excludePeople, err = exclude_record.GetExcludePeopleSetNow()
 	}
 
 	var peopleRet = []*schema.DBPerson{}
 	for _, p := range people {
-		if _, ok := excludePeoples[p.NationalID]; !ok {
+		if _, ok := excludePeople[p.NationalID]; !ok {
 			peopleRet = append(peopleRet, p)	
 		}
 	}

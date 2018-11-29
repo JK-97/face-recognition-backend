@@ -4,6 +4,7 @@ import (
 	"context"
     "time"
 
+	"github.com/google/uuid"
 	"github.com/mongodb/mongo-go-driver/mongo"
     "github.com/mongodb/mongo-go-driver/options"
 
@@ -36,9 +37,11 @@ func GetSettings() (*schema.SettingsReq, int64, error) {
 // UpdateSettings update settings in db: create if not exists
 func UpdateSettings(h *schema.SettingsReq) error {
     d := schema.ReqToSettings(h)
+	uuid, err := uuid.NewUUID()
+    d.ID = uuid.String()
     opt := &options.UpdateOptions{}
     opt.SetUpsert(true)
-	_, err := collection().UpdateOne(context.Background(), map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE}, d, opt)
+	_, err = collection().UpdateOne(context.Background(), map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE}, d, opt)
 
     timer.UpdateTimer()
 	return err
