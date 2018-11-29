@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
 
+	"github.com/google/uuid"
+
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
@@ -35,7 +37,9 @@ func UpdateImages(nationalID string, imgs []string) error {
 
 // AddImages add a person's image in db
 func AddImages(nationalID string, imgs []string) error {
+	uid, _ := uuid.NewUUID()
     doc := schema.DBImages{
+        ID:             uid.String(),
         NationalID:     nationalID,
         Images:         imgs,
     }

@@ -2,6 +2,7 @@ package exclude_record
 
 import (
 	"context"
+	"github.com/google/uuid"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
@@ -10,6 +11,8 @@ import (
 // AddExcludeRecord add a record to db
 func AddExcludeRecord(p *schema.ExcludeRecordReq, excludeTime int64) error {
 	dbp := schema.NewDBExcludeRecord(p, excludeTime)
+    uid, _ :=  uuid.NewUUID()
+    dbp.ID = uid.String()
 	_, err := collection().InsertOne(context.Background(), dbp)
 	if err != nil {
 		return err

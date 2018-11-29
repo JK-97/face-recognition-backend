@@ -25,7 +25,7 @@ func Routes() http.Handler {
 
 	// people
 	mux.HandleFunc("/api/v1/face_records", controller.FaceRecordsGET)
-	mux.HandleFunc("/api/v1/checkin_people", controller.CheckinPeoplePOSTDELETEGETPUT)
+	mux.HandleFunc("/api/v1/checkin_people", controller.CheckinPeoplePOSTDELETEGETPUT) // ?id=xxx&full_images=1
 	mux.HandleFunc("/api/v1/checkin_people_list", controller.CheckinPeopleListGET) // ?exclude=1
 	mux.HandleFunc("/api/v1/start_recording", controller.StartRecordingPOST)
 
@@ -36,8 +36,8 @@ func Routes() http.Handler {
 
 	// exclude people
 	mux.HandleFunc("/api/v1/exclude_record", controller.ExcludeRecordGETPOSTPUT)
-	// POST {"peoples": [{}, {}"], reason: ""}
-	// GET response: [{"peoples": [{}, {}}], exclude_time: "", reason: "", id: "", include_time: }, ] query args: exclude=1&skip=0&limit=10
+	// POST {"people": [{}, {}"], reason: ""}
+	// GET response: [{"people": [{}, {}}], exclude_time: "", reason: "", id: "", include_time: }, ] query args: exclude=1&skip=0&limit=10
 	// PUT query args id=
 
 	// get image
