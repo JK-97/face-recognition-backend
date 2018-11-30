@@ -9,6 +9,7 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/exclude_record"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 // ExcludeRecordGETPOSTPUT handle requests
@@ -70,6 +71,7 @@ func ExcludeRecordPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+    log.Info("people: %v", people)
 	for _, r := range excludeRecord.People {
 		if _, ok := people[r.NationalID]; ok {
 			Error(w, err, http.StatusNotAcceptable)

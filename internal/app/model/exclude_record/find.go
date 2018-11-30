@@ -19,14 +19,14 @@ func collection() *mongo.Collection {
 // includeBack == false --> query exclude_record who didn't came back yet
 func NewFilterExclude(excludeTime int64, includeBack bool) map[string]interface{} {
 	filter := make(map[string]interface{})
-	filter["exclude_time"] = map[string]int64{"$gt": excludeTime}
+	filter["exclude_time"] = map[string]int64{"$lt": excludeTime}
 	if !includeBack {
 		filter["include_time"] = -1
 	}
 	return filter
 }
 
-// NewFilterExclude creates a filter for exclude record in exclude_record at timestmap
+// NewFilterExcludeHistory creates a filter for exclude record in exclude_record at timestmap
 func NewFilterExcludeHistory(timestamp int64) map[string]interface{} {
 
     type Et struct {
@@ -110,7 +110,6 @@ func GetExcludePeopleSet(filter map[string]interface{}, limit int, skip int) (ma
 
 // GetExcludePeopleSetNow sample function
 func GetExcludePeopleSetNow() (map[string]int64, error) {
-	// 获取当前所有的外出的人
 	now := util.NowMilli()
 	filter := NewFilterExclude(now, false)
 	return GetExcludePeopleSet(filter, -1, -1)
