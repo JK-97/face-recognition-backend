@@ -37,7 +37,7 @@ func Routes() http.Handler {
 	// exclude people
 	mux.HandleFunc("/api/v1/exclude_record", controller.ExcludeRecordGETPOSTPUT)
 	// POST {"people": [{}, {}"], reason: ""}
-	// GET response: [{"people": [{}, {}}], exclude_time: "", reason: "", id: "", include_time: }, ] query args: exclude=1&skip=0&limit=10
+	// GET response: [{"people": [{}, {}}], exclude_time: "", reason: "", id: "", include_time: }, ] query args: all=1&skip=0&limit=10
 	// PUT query args id=
 
 	// get image

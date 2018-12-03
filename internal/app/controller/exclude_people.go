@@ -28,7 +28,7 @@ func ExcludeRecordGETPOSTPUT(w http.ResponseWriter, r *http.Request) {
 
 // ExcludeRecordGET handle get requests
 func ExcludeRecordGET(w http.ResponseWriter, r *http.Request) {
-	excludeFlag := r.URL.Query().Get("exclude")
+	excludeFlag := r.URL.Query().Get("all")
 	skip := r.URL.Query().Get("skip")
 	limit := r.URL.Query().Get("limit")
 	s := -1
@@ -40,7 +40,7 @@ func ExcludeRecordGET(w http.ResponseWriter, r *http.Request) {
 		l, _ = strconv.Atoi(limit)
 	}
 
-	filter := exclude_record.NewFilterExclude(util.NowMilli(), excludeFlag == "")
+	filter := exclude_record.NewFilterExclude(util.NowMilli(), excludeFlag != "")
 	resp, err := exclude_record.GetExcludeRecord(filter, l, s)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
