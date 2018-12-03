@@ -15,8 +15,7 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
-// RegisterSettingsTimer just init timer
-var RegisterSettingsTimer = timer.RegisterHandler(AutoCheckinTimer, true)
+var registerSettingsTimer = timer.RegisterHandler(AutoCheckinTimer)
 
 func collection() *mongo.Collection {
 	return model.DB.Collection("settings")
@@ -37,13 +36,21 @@ func GetSettings() (*schema.SettingsReq, int64, error) {
 // UpdateSettings update settings in db: create if not exists
 func UpdateSettings(h *schema.SettingsReq) error {
     d := schema.ReqToSettings(h)
-	uuid, err := uuid.NewUUID()
-    d.ID = uuid.String()
+    _, _, err := GetSettings()
+    if err == mongo.ErrNoDocuments {
+        uuid, _ := uuid.NewUUID()
+        d.ID = uuid.String()
+    } else if err != nil {
+        return err
+    }
     opt := &options.UpdateOptions{}
     opt.SetUpsert(true)
-	_, err = collection().UpdateOne(context.Background(), map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE}, d, opt)
+	_, err = collection().UpdateOne(context.Background(),
+        map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE},
+        map[string]schema.Settings{"$set": d},
+        opt)
 
-    timer.UpdateTimer()
+    timer.UpdateTimer(registerSettingsTimer)
 	return err
 }
 
@@ -51,7 +58,9 @@ func UpdateSettings(h *schema.SettingsReq) error {
 func UpdateSettingsWithLast(h *schema.SettingsReq, last int64) error {
     d := schema.ReqToSettings(h)
     d.LastChecktime = last
-	_, err := collection().UpdateOne(context.Background(), map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE}, d)
+	_, err := collection().UpdateOne(context.Background(),
+        map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE},
+        map[string]schema.Settings{"$set": d})
 	return err
 }
 
@@ -83,7 +92,7 @@ func AutoCheckinTimer() (int64, error) {
                 go func() {
                     <- waitTimer.C
                     t, err := checkin.DefaultCheckiner.Stop(id)
-                    log.Info("AutoCheckTimer: %ld: ", t, err)
+                    log.Info("AutoCheckTimer: %d: ", t, err)
                 } ()
             }
         }

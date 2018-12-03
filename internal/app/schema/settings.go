@@ -14,7 +14,7 @@ func (t *CheckinTimestamp) TranslateToSec() int64 {
 
 // Settings is a program db settings
 type Settings struct {
-	ID         string   `json:"id" bson:"_id"`
+	ID         string   `json:"id" bson:"_id,omitempty"`
 	Name       string   `json:"name" bson:"name"`
     Starttime  CheckinTimestamp `json:"starttime" bson:"starttime"`
     Endtime    CheckinTimestamp `json:"endtime" bson:"endtime"`

@@ -73,9 +73,10 @@ func GetHistory(timestamp int64) (*schema.CheckinHistory, error) {
 	doc := collection().FindOne(context.Background(), map[string]int64{"start_time": timestamp})
 	result := &schema.CheckinHistory{}
 	err := doc.Decode(&result)
-	if err != nil {
+    if err == mongo.ErrNoDocuments {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
-
 	return result, nil
 }

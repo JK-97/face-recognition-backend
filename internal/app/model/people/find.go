@@ -57,12 +57,15 @@ func GetPeople(filter map[string]interface{}, limit int, skip int) ([]*schema.DB
 
 	ctx := context.Background()
 	cur, err := collection().Find(ctx, filter, opt)
-	if err != nil {
+
+	result := []*schema.DBPerson{}
+    if err == mongo.ErrNoDocuments {
+        return result, nil
+	} else if err != nil {
 		return nil, err
 	}
 	defer cur.Close(ctx)
 
-	result := []*schema.DBPerson{}
 	for cur.Next(ctx) {
 		dbp := &schema.DBPerson{}
 		if err := cur.Decode(dbp); err != nil {

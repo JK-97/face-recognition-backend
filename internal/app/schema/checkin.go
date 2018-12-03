@@ -42,6 +42,8 @@ type CheckinPerson struct {
 	Location     string `json:"location"`
 	NationalID   string `json:"national_id"`
 	Image        string `json:"image"`
+	ImageURL     string `json:"image_url"`
+	Group        string `json:"group"`
 }
 
 // CheckinPerson gets CheckinPerson from DBPerson
@@ -52,6 +54,7 @@ func (p *DBPerson) CheckinPerson() *CheckinPerson {
 		Name:         p.Name,
 		Location:     p.Location,
 		NationalID:   p.NationalID,
-		Image:        p.Image,
+		ImageURL:     p.ImageURL,
+		Group:        p.Group,
 	}
 }

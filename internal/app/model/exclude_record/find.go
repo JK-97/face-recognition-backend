@@ -1,10 +1,13 @@
 package exclude_record
 
 import (
+    "fmt"
 	"context"
 
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/options"
+    "gopkg.in/mgo.v2/bson"
+
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
@@ -26,41 +29,45 @@ func NewFilterExclude(excludeTime int64, includeBack bool) map[string]interface{
 	return filter
 }
 
-// NewFilterExcludeHistory creates a filter for exclude record in exclude_record at timestmap
-func NewFilterExcludeHistory(timestamp int64) map[string]interface{} {
+// NewFilterExcludeHistory creates a filter for exclude record in exclude_record at timestamp
+func NewFilterExcludeHistory(timestamp int64) interface{} {
 
-    type Et struct {
-        Gt int64 `json:"$gt" bson:"$gt"`
-    }
-    type It struct {
-        Lt int64 `json:"$lt" bson:"$lt"`
-        Eq int64 `json:"$eq" bson:"$eq"`
-    }
-    type HistoryFilter []struct {
-        ExcludeTime Et     `json:"exclude_time" bson:"exclude_time"`
-        IncludeTime []It   `json:"include_time" bson:"include_time"`
-    }
+    const queryStrTem = `{"$and":[{"exclude_time": {"$lt":%d}},{"$or":[{"include_time": {"$eq": -1}},{"include_time": {"$gt": %d}}]}]}`
+    queryStr := fmt.Sprintf(queryStrTem, uint64(timestamp), uint64(timestamp))
 
-    var vf = HistoryFilter {
-        {
-            ExcludeTime: Et {
-                Gt: timestamp,
-            },
-        }, {
-            IncludeTime:[]It{
-                It{Lt: timestamp},
-                It{Eq: -1},
-            },
-        },
-    }
+    // type Et struct {
+    //     Gt int64 `json:"$gt" bson:"$gt"`
+    // }
+    // type It struct {
+    //     Lt int64 `json:"$lt" bson:"$lt"`
+    //     Eq int64 `json:"$eq" bson:"$eq"`
+    // }
+    // type HistoryFilter []struct {
+    //     ExcludeTime Et     `json:"exclude_time" bson:"exclude_time"`
+    //     IncludeTime []It   `json:"include_time" bson:"include_time"`
+    // }
+    // var vf = HistoryFilter {
+    //     {
+    //         ExcludeTime: Et {
+    //             Gt: timestamp,
+    //         },
+    //     }, {
+    //         IncludeTime:[]It{
+    //             It{Lt: timestamp},
+    //             It{Eq: -1},
+    //         },
+    //     },
+    // }
+    // filter := make(map[string]interface{}) 
+    // filter["$and"] = vf
 
-    filter := make(map[string]interface{}) 
-    filter["$and"] = vf
+    var filter interface{}
+    _ = bson.UnmarshalJSON([]byte(queryStr), &filter)
     return filter
 }
 
 // GetExcludeRecord gets list of exclude record in db
-func GetExcludeRecord(filter map[string]interface{}, limit int, skip int) ([]*schema.DBExcludeRecord, error) {
+func GetExcludeRecord(filter interface{}, limit int, skip int) ([]*schema.DBExcludeRecord, error) {
 	ctx := context.Background()
 	var cur mongo.Cursor
 	var err error
@@ -73,12 +80,15 @@ func GetExcludeRecord(filter map[string]interface{}, limit int, skip int) ([]*sc
 	} else {
 		cur, err = collection().Find(ctx, filter)
 	}
-	if err != nil {
+
+	result := []*schema.DBExcludeRecord{}
+    if err == mongo.ErrNoDocuments {
+        return result, nil
+	} else if err != nil {
 		return nil, err
 	}
 	defer cur.Close(ctx)
 
-	result := []*schema.DBExcludeRecord{}
 	for cur.Next(ctx) {
 		dbp := &schema.DBExcludeRecord{}
 		if err := cur.Decode(dbp); err != nil {
@@ -90,22 +100,26 @@ func GetExcludeRecord(filter map[string]interface{}, limit int, skip int) ([]*sc
 	return result, nil
 }
 
-// GetExcludePeopleSet gets set of exclude record in db
-func GetExcludePeopleSet(filter map[string]interface{}, limit int, skip int) (map[string]int64, error) {
+// MakeExcludePeopleSet make set of people
+func MakeExcludePeopleSet(records []*schema.DBExcludeRecord) map[string]int64 {
 	result := make(map[string]int64)
-	records, err := GetExcludeRecord(filter, limit, skip)
-	if err != nil {
-		return nil, err
-	}
 	for index := 0; index < len(records); index++ {
 		excludeTime := records[index].ExcludeTime
 		people := records[index].People
 		for i := 0; i < len(people); i++ {
 			result[people[i].NationalID] = excludeTime
 		}
-
 	}
-	return result, nil
+    return result
+}
+
+// GetExcludePeopleSet gets set of exclude record in db
+func GetExcludePeopleSet(filter interface{}, limit int, skip int) (map[string]int64, error) {
+	records, err := GetExcludeRecord(filter, limit, skip)
+	if err != nil {
+		return nil, err
+	}
+	return MakeExcludePeopleSet(records), nil
 }
 
 // GetExcludePeopleSetNow sample function
