@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 	"strconv"
-    "fmt"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
@@ -27,7 +26,7 @@ func CheckinGETCurrent(w http.ResponseWriter, r *http.Request) {
     status := checkin.DefaultCheckiner.Status()
 
     if t == 0 {
-		Error(w, fmt.Errorf("no checkin result"), http.StatusNotFound)
+	    respondJSON("", w, r)
         return 
     }
 
@@ -55,11 +54,10 @@ func CheckinGETHistory(w http.ResponseWriter, r *http.Request, t int64) {
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
-	}
-	if history == nil {
-		Error(w, err, http.StatusInternalServerError)
+	} else if history == nil {
+		Error(w, err, http.StatusNotFound)
 		return
-	}
+    }
 
     data, err := CheckinResult(&history.Record, t)
     if err != nil {
@@ -92,10 +90,12 @@ func CheckinResult(record *[]string, t int64) (*schema.CheckinResp, error) {
 		return nil, err
 	}
 
+    excludeSet := exclude_record.MakeExcludePeopleSet(exclude)
+
 	return &schema.CheckinResp{
 		ActualCount:   len(*record),
-		Present:       dB2CheckinPeople(present),
-		Absent:        dB2CheckinPeople(absent),
+		Present:       dB2CheckinPeople(present, nil),
+		Absent:        dB2CheckinPeople(absent, &excludeSet),
         ExcludeRecord: exclude,
 	}, nil
 }
@@ -116,10 +116,19 @@ func CheckinGET(w http.ResponseWriter, r *http.Request) {
     CheckinGETHistory(w, r, int64(t))
 }
 
-func dB2CheckinPeople(l []*schema.DBPerson) []*schema.CheckinPerson {
-	res := make([]*schema.CheckinPerson, len(l))
-	for i, p := range l {
-		res[i] = p.CheckinPerson()
-	}
+func dB2CheckinPeople(l []*schema.DBPerson, filter *map[string]int64) []*schema.CheckinPerson {
+	res := []*schema.CheckinPerson{}
+    if filter == nil {
+	    res = make([]*schema.CheckinPerson, len(l))
+        for i, p := range l {
+            res[i] = p.CheckinPerson()
+        }
+    } else {
+        for _, p := range l {
+            if _, ok := (*filter)[p.NationalID]; !ok {
+                res = append(res, p.CheckinPerson())
+            }
+        }
+    }
 	return res
 }

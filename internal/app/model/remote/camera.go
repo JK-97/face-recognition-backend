@@ -17,7 +17,9 @@ func Capture(deviceName string) (string, error) {
 	resp, err := http.Get(requestURL)
 	if err != nil {
 		return "", err
-	}
+	} else if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("bad response of remote")
+    }
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

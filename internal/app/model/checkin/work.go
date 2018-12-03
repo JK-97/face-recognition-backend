@@ -69,6 +69,7 @@ func checkin() error {
 		go func(d *schema.Camera) error {
 			img, err := remote.Capture(d.DeviceName)
 			if err != nil {
+                log.Info("device capture is not working: %c", d.DeviceName)
 				return err
 			}
 

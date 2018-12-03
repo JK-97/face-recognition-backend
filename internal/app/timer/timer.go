@@ -47,8 +47,8 @@ var checkTimer *time.Timer
 var handlerQueue = &JobQueue{}
 var timerMutex = &sync.Mutex{}
 
-// RunTimer run timer
-func RunTimer() {
+// RunNextTimer run timer
+func RunNextTimer() {
 	if len(*handlerQueue) != 0 {
 		checkTimer = time.NewTimer(time.Second * handlerQueue.LastTimestamp())
 		go func() {
@@ -64,43 +64,62 @@ func RunTimer() {
 func DoJob() {
 	timerMutex.Lock()
 	job := heap.Pop(handlerQueue).(*Job)
+	timerMutex.Unlock()
+
 	nextTime, err := job.cb()
 	if err != nil {
 		log.Error(err)
 	}
+
 	if nextTime != 0 {
-		handlerQueue.Push(&Job{
-			cb:        job.cb,
-			timestamp: nextTime,
-		})
-	}
-	timerMutex.Unlock()
-	RunTimer()
+        job.timestamp = nextTime
+	    timerMutex.Lock()
+		handlerQueue.Push(job)
+	    timerMutex.Unlock()
+    }
+
+	RunNextTimer()
 }
 
 // RegisterHandler registe timer handler
-func RegisterHandler(cb Callback, init bool) int {
+func RegisterHandler(cb Callback) *Job {
 	timerMutex.Lock()
 	if handlerQueue == nil {
 		heap.Init(handlerQueue)
 	}
-	retry := len(*handlerQueue) == 0
-	handlerQueue.Push(&Job{
-		cb:        cb,
-		timestamp: 0, // do it right now
-	})
-	ret := len(*handlerQueue)
 	timerMutex.Unlock()
-	if retry && !init {
-		log.Info("Timer will run: find job")
-		RunTimer()
-	}
-	return ret
+
+    var job = &Job{
+		cb:        cb,
+		timestamp: 1, // do it right now
+    }
+
+	timerMutex.Lock()
+	handlerQueue.Push(job)
+	timerMutex.Unlock()
+
+	return job
 }
 
 // UpdateTimer stop timer and retry
-func UpdateTimer() {
+func UpdateTimer(job *Job) {
 	log.Info("Timer will stop: try to update")
 	checkTimer.Stop()
-	RunTimer()
+
+    nextTime, err := job.cb()
+    if err != nil {
+        log.Warn("Timer will stop: ", err)
+        return
+    }
+    job.timestamp = nextTime
+
+	timerMutex.Lock()
+    if job.timestamp != 0 {
+	    handlerQueue.Push(job)
+    }
+	timerMutex.Unlock()
+
+    // TODO 二分查找
+	heap.Init(handlerQueue)
+	RunNextTimer()
 }

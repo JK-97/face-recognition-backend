@@ -44,7 +44,7 @@ to quickly create a Cobra application.`,
 		}()
 
 		go func() {
-			timer.RunTimer()	
+			timer.RunNextTimer()	
 		}()
 
 		forever := make(chan struct{})
