@@ -82,7 +82,7 @@ func DoJob() {
 }
 
 // RegisterHandler registe timer handler
-func RegisterHandler(cb Callback) *Job {
+func RegisterHandler(cb Callback, nextTime int64) *Job {
 	timerMutex.Lock()
 	if handlerQueue == nil {
 		heap.Init(handlerQueue)
@@ -91,7 +91,7 @@ func RegisterHandler(cb Callback) *Job {
 
     var job = &Job{
 		cb:        cb,
-		timestamp: 1, // do it right now
+		timestamp: nextTime,
     }
 
 	timerMutex.Lock()
@@ -102,24 +102,18 @@ func RegisterHandler(cb Callback) *Job {
 }
 
 // UpdateTimer stop timer and retry
-func UpdateTimer(job *Job) {
+func UpdateTimer(job *Job, nextTime int64) {
 	log.Info("Timer will stop: try to update")
 	checkTimer.Stop()
 
-    nextTime, err := job.cb()
-    if err != nil {
-        log.Warn("Timer will stop: ", err)
-        return
-    }
-    job.timestamp = nextTime
-
+    // TODO 二分查找
 	timerMutex.Lock()
-    if job.timestamp != 0 {
+    if nextTime != 0 {
+        job.timestamp = nextTime
 	    handlerQueue.Push(job)
     }
+	heap.Init(handlerQueue)
 	timerMutex.Unlock()
 
-    // TODO 二分查找
-	heap.Init(handlerQueue)
 	RunNextTimer()
 }
