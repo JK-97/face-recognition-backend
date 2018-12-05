@@ -47,6 +47,9 @@ func Routes() http.Handler {
 	// login
 	mux.HandleFunc("/api/v1/login", controller.LoginPOST)
 	// POST {"username": "", "password": "md5passwd"}
+	// logout
+	mux.HandleFunc("/api/v1/logout", controller.LogoutPOST)
+	// POST
 
     // settings 
 	mux.HandleFunc("/api/v1/settings", controller.SettingsPOSTGET)

@@ -70,6 +70,17 @@ func LoginPOST(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "hello world")
 }
 
+// LogoutPOST set empty login cookie
+func LogoutPOST(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:    "ticket",
+		Value:   "",
+		Expires: time.Now().Add(86400 * 30 * time.Second), // TODO configuration?
+	})
+	w.Header().Set("Content-Type", "application/text")
+	io.WriteString(w, "Goodbye")
+}
+
 // CheckLoginSession check every api call with cookie
 func CheckLoginSession(w http.ResponseWriter, r *http.Request) error {
 	ticketCookie, _ := r.Cookie("ticket")
