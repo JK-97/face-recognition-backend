@@ -19,7 +19,6 @@ type Settings struct {
     Starttime  CheckinTimestamp `json:"starttime" bson:"starttime"`
     Endtime    CheckinTimestamp `json:"endtime" bson:"endtime"`
     Interval   int64    `json:"interval" bson:"interval"`
-    LastChecktime int64 `json:"lastchecktime" bson:"lastchecktime"`
 }
 
 // SettingsReq is a settings in http req/resp

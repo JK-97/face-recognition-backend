@@ -9,7 +9,7 @@ import (
 )
 
 // Callback is timer handler
-type Callback func() (int64, error)
+type Callback func(bool) (int64, error)
 
 // Job is warpper of timer handler
 type Job struct {
@@ -50,11 +50,23 @@ var timerMutex = &sync.Mutex{}
 // RunNextTimer run timer
 func RunNextTimer() {
 	if len(*handlerQueue) != 0 {
+
+        for handlerQueue.LastTimestamp() == -1 {
+            timerMutex.Lock()
+            job := heap.Pop(handlerQueue).(*Job)
+            timerMutex.Unlock()
+            job.timestamp, _ = job.cb(true)
+            timerMutex.Lock()
+		    handlerQueue.Push(job)
+            timerMutex.Unlock()
+        }
+
 		checkTimer = time.NewTimer(time.Second * handlerQueue.LastTimestamp())
 		go func() {
 			<-checkTimer.C
 			DoJob()
 		}()
+
 	} else {
 		log.Info("Timer won't run: no job")
 	}
@@ -66,7 +78,7 @@ func DoJob() {
 	job := heap.Pop(handlerQueue).(*Job)
 	timerMutex.Unlock()
 
-	nextTime, err := job.cb()
+	nextTime, err := job.cb(false)
 	if err != nil {
 		log.Error(err)
 	}
@@ -82,7 +94,7 @@ func DoJob() {
 }
 
 // RegisterHandler registe timer handler
-func RegisterHandler(cb Callback, nextTime int64) *Job {
+func RegisterHandler(cb Callback) *Job {
 	timerMutex.Lock()
 	if handlerQueue == nil {
 		heap.Init(handlerQueue)
@@ -91,7 +103,7 @@ func RegisterHandler(cb Callback, nextTime int64) *Job {
 
     var job = &Job{
 		cb:        cb,
-		timestamp: nextTime,
+		timestamp: -1,
     }
 
 	timerMutex.Lock()
