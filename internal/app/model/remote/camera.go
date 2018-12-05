@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+    "bytes"
+    "encoding/json"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/device"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 // Capture an image from camera server
@@ -28,4 +33,26 @@ func Capture(deviceName string) (string, error) {
 
 	encoded := base64.StdEncoding.EncodeToString(b)
 	return encoded, nil
+}
+
+// AddDevices add post all device in db to Capture services
+func AddDevices() {
+	cfg := config.Config()
+	cameraAddr := cfg.GetString("camera-addr")
+	requestURL := fmt.Sprintf("%s", cameraAddr)
+
+	cameras, err := device.GetCameras()
+    if err != nil {
+        log.Info("Device Post Failed: ", err)
+        return
+    }
+
+    for _, c := range cameras {
+        pc := &schema.CaptureCamera{
+            Device: c.DeviceName,
+        }
+        jsonValue, _ := json.Marshal(pc)
+	    resp, err := http.Post(requestURL,"application/json",  bytes.NewBuffer(jsonValue))
+        log.Info("Device Post: ", pc, " result: ", resp, " error: ", err)
+    }
 }

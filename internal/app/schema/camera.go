@@ -8,5 +8,9 @@ type Camera struct {
 	DeviceName string `json:"device_name" bson:"device_name"`
 }
 
+type CaptureCamera struct {
+	Device string `json:"device"`
+}
+
 // CameraListResp is response of get camera list
 type CameraListResp []Camera
