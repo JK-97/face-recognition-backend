@@ -3,6 +3,7 @@ package settings
 import (
 	"context"
     "time"
+    "errors"
 
 	"github.com/google/uuid"
 	"github.com/mongodb/mongo-go-driver/mongo"
@@ -15,28 +16,31 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
-var registerSettingsTimer = timer.RegisterHandler(AutoCheckinTimer, nextCheckinTime())
+var registerSettingsTimer = timer.RegisterHandler(AutoCheckinTimer)
 
 func collection() *mongo.Collection {
 	return model.DB.Collection("settings")
 }
 
 // GetSettings get settings
-func GetSettings() (*schema.SettingsReq, int64, error) {
-    // TODO region as default
-	doc := collection().FindOne(context.Background(), map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE})
+func GetSettings() (*schema.SettingsReq, error) {
+    db := collection()
+    if db == nil {
+        return nil, errors.New("DB uninit")
+    }
+	doc := db.FindOne(context.Background(), map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE})
 	result := &schema.Settings{}
 	err := doc.Decode(&result)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-    return schema.SettingsToReq(result), result.LastChecktime, nil
+    return schema.SettingsToReq(result), nil
 }
 
 // UpdateSettings update settings in db: create if not exists
 func UpdateSettings(h *schema.SettingsReq) error {
     d := schema.ReqToSettings(h)
-    _, _, err := GetSettings()
+    _, err := GetSettings()
     if err == mongo.ErrNoDocuments {
         uuid, _ := uuid.NewUUID()
         d.ID = uuid.String()
@@ -54,21 +58,11 @@ func UpdateSettings(h *schema.SettingsReq) error {
 	return err
 }
 
-// UpdateSettingsWithLast update last checking time
-func UpdateSettingsWithLast(h *schema.SettingsReq, last int64) error {
-    d := schema.ReqToSettings(h)
-    d.LastChecktime = last
-	_, err := collection().UpdateOne(context.Background(),
-        map[string]string{"name": schema.SETTING_CHECKIN_SCHEDULE},
-        map[string]schema.Settings{"$set": d})
-	return err
-}
-
 func nextCheckinTime() int64 {
     now := time.Now()
     nowSeconds := int64(now.Hour() * 3600 + now.Minute() * 60 + now.Second())
 
-    s, _, err := GetSettings()
+    s, err := GetSettings()
     if err != nil {
         log.Warn("nextCheckingTime: ", err)
         return 0
@@ -95,7 +89,11 @@ func nextCheckinTime() int64 {
 }
 
 // AutoCheckinTimer auto checking
-func AutoCheckinTimer() (int64, error) {
+func AutoCheckinTimer(init bool) (int64, error) {
+
+    if init {
+        return nextCheckinTime(), nil
+    }
 
     // TODO maybe need try more time
     id, err := checkin.DefaultCheckiner.Start()

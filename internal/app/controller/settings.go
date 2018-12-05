@@ -23,7 +23,7 @@ func SettingsPOSTGET(w http.ResponseWriter, r *http.Request) {
 
 // SettingsGET return camera list
 func SettingsGET(w http.ResponseWriter, r *http.Request) {
-	s, _, err := settings.GetSettings()
+	s, err := settings.GetSettings()
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
