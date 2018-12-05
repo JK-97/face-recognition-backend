@@ -15,7 +15,7 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
-var registerSettingsTimer = timer.RegisterHandler(AutoCheckinTimer)
+var registerSettingsTimer = timer.RegisterHandler(AutoCheckinTimer, nextCheckinTime())
 
 func collection() *mongo.Collection {
 	return model.DB.Collection("settings")
@@ -50,7 +50,7 @@ func UpdateSettings(h *schema.SettingsReq) error {
         map[string]schema.Settings{"$set": d},
         opt)
 
-    timer.UpdateTimer(registerSettingsTimer)
+    timer.UpdateTimer(registerSettingsTimer, nextCheckinTime())
 	return err
 }
 
@@ -64,53 +64,49 @@ func UpdateSettingsWithLast(h *schema.SettingsReq, last int64) error {
 	return err
 }
 
-// AutoCheckinTimer auto checking
-func AutoCheckinTimer() (int64, error) {
-    s, last, err := GetSettings()
-    if err != nil {
-        return 0, err
-    }
-    
+func nextCheckinTime() int64 {
     now := time.Now()
     nowSeconds := int64(now.Hour() * 3600 + now.Minute() * 60 + now.Second())
+
+    s, _, err := GetSettings()
+    if err != nil {
+        log.Warn("nextCheckingTime: ", err)
+        return 0
+    }
+
     start := s.Starttime.TranslateToSec()
     end := s.Endtime.TranslateToSec()
-    if last == 0 {
-        last = start
-    }
 
     var nextTime int64
-    if nowSeconds < end && nowSeconds >= start {
-        pending := last + s.Interval
-        if nowSeconds > pending && pending < end {
-            last = int64((nowSeconds - start) / s.Interval) * s.Interval
-
-            // TODO maybe need try more time
-            id, err := checkin.DefaultCheckiner.Start()
-            if err == nil {
-                waitTimer := time.NewTimer(30 * time.Second)
-                go func() {
-                    <- waitTimer.C
-                    t, err := checkin.DefaultCheckiner.Stop(id)
-                    log.Info("AutoCheckTimer: %d: ", t, err)
-                } ()
-            }
-        }
-
-        if nowSeconds + s.Interval > 86400 {
-            last = start
-            nextTime = start + 86400 - nowSeconds
-        } else {
-            nextTime = nowSeconds - last + s.Interval
-        }
-    } else if nowSeconds < start {
-        nextTime = start + nowSeconds
-        last = start
+    if nowSeconds <= end && nowSeconds >= start {
+        dt := nowSeconds - start
+        nextTime = s.Interval - (dt - (dt / s.Interval) * s.Interval)
+    } else if nowSeconds < end {
+        nextTime = start - nowSeconds
     } else {
-        nextTime = start + 86400 - nowSeconds
-        last = start
+        nextTime = 86400 - nowSeconds + start
     }
 
-    err = UpdateSettingsWithLast(s, last)
-    return nextTime, err
+    if nextTime == 0 {
+        nextTime = 1
+    }
+
+    return nextTime
+}
+
+// AutoCheckinTimer auto checking
+func AutoCheckinTimer() (int64, error) {
+
+    // TODO maybe need try more time
+    id, err := checkin.DefaultCheckiner.Start()
+    if err == nil {
+        waitTimer := time.NewTimer(30 * time.Second)
+        go func() {
+            <- waitTimer.C
+            t, err := checkin.DefaultCheckiner.Stop(id)
+            log.Info("AutoCheckTimer: %d: ", t, err)
+        } ()
+    }
+
+    return nextCheckinTime(), err
 }
