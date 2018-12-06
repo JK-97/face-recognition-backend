@@ -48,6 +48,15 @@ func DecodeTicket(ticketStr string) (*schema.UserTicket, error) {
 	return t, nil
 }
 
+// FindTicket return ticket in database
+func FindTicket(userName string, nonceStr string) error {
+	_, err := collection().Find(context.Background(), map[string]string{
+        "username": userName, 
+        "nonce_str": nonceStr,
+    })
+    return err
+}
+
 // CreateTicket create ticket after user login with passwd
 func CreateTicket(userName string) (string, error) {
 	uid, _ := uuid.NewUUID()

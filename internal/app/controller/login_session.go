@@ -83,18 +83,20 @@ func LogoutPOST(w http.ResponseWriter, r *http.Request) {
 
 // CheckLoginSession check every api call with cookie
 func CheckLoginSession(w http.ResponseWriter, r *http.Request) error {
-	ticketCookie, _ := r.Cookie("ticket")
+	ticketCookie, err := r.Cookie("ticket")
     if ticketCookie != nil {
-        _, err := ticket.DecodeTicket(ticketCookie.Value)
-        if err != nil {
-            Error(w, err, 499)
-            return err
+        t, err := ticket.DecodeTicket(ticketCookie.Value)
+        if err == nil {
+            err = ticket.FindTicket(t.UserName, t.NonceStr)
         }
     } else {
-        err := errors.New("Cookies not set")
-        Error(w, err, 499)
-        return err
+        err = errors.New("Cookies not set")
     }
+
+    if err != nil {
+        Error(w, err, 499)
+    }
+
 	// TODO check login session life-time
-	return nil
+	return err
 }
