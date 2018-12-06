@@ -2,20 +2,29 @@ package remote
 
 import (
 	"encoding/base64"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+    "bytes"
+    "encoding/json"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/device"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 // Capture an image from camera server
-func Capture() (string, error) {
+func Capture(deviceName string) (string, error) {
 	cfg := config.Config()
 	cameraAddr := cfg.GetString("camera-addr")
-	resp, err := http.Get(cameraAddr)
+	requestURL := fmt.Sprintf("%s?device=%s", cameraAddr, deviceName)
+	resp, err := http.Get(requestURL)
 	if err != nil {
 		return "", err
-	}
+	} else if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("bad response of remote")
+    }
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -24,4 +33,26 @@ func Capture() (string, error) {
 
 	encoded := base64.StdEncoding.EncodeToString(b)
 	return encoded, nil
+}
+
+// AddDevices add post all device in db to Capture services
+func AddDevices() {
+	cfg := config.Config()
+	cameraAddr := cfg.GetString("camera-addr")
+	requestURL := fmt.Sprintf("%s", cameraAddr)
+
+	cameras, err := device.GetCameras()
+    if err != nil {
+        log.Info("Device Post Failed: ", err)
+        return
+    }
+
+    for _, c := range cameras {
+        pc := &schema.CaptureCamera{
+            Device: c.DeviceName,
+        }
+        jsonValue, _ := json.Marshal(pc)
+	    resp, err := http.Post(requestURL,"application/json",  bytes.NewBuffer(jsonValue))
+        log.Info("Device Post: ", pc, " result: ", resp, " error: ", err)
+    }
 }

@@ -37,7 +37,7 @@ to quickly create a Cobra application.`,
 		case "detect":
 			remote.TestDetect()
 		case "capture":
-			remote.Capture()
+			remote.Capture("")
 		}
 	},
 }
