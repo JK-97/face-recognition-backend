@@ -81,8 +81,4 @@ func init() {
 
     serveCmd.PersistentFlags().String("apigateway-addr", "http://192.168.0.196:8008", "APIGateway server address")
 	cfg.BindPFlag("apigateway-addr", serveCmd.PersistentFlags().Lookup("apigateway-addr"))
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

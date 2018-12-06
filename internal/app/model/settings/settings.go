@@ -95,6 +95,8 @@ func AutoCheckinTimer(init bool) (int64, error) {
         return nextCheckinTime(), nil
     }
 
+    log.Info("start AutoCheckinTimer")
+
     // TODO maybe need try more time
     id, err := checkin.DefaultCheckiner.Start()
     if err == nil {
