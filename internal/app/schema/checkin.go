@@ -24,12 +24,14 @@ type CheckinHistoryResp []int64
 
 // CheckinResp is a response of CheckinGET
 type CheckinResp struct {
-	Timestamp     int64            `json:"timestamp"`
-	CostTime      int64            `json:"cost_time"`
-	ExpectedCount int              `json:"expected_count"`
-	ActualCount   int              `json:"actual_count"`
-	Present       []*CheckinPerson `json:"present"`
-	Absent        []*CheckinPerson `json:"absent"`
+	Timestamp     int64                 `json:"timestamp"`
+	CostTime      int64                 `json:"cost_time"`
+	ExpectedCount int                   `json:"expected_count"`
+	ActualCount   int                   `json:"actual_count"`
+	Present       []*CheckinPerson      `json:"present"`
+	Absent        []*CheckinPerson      `json:"absent"`
+    ExcludeRecord []*DBExcludeRecord    `json:"exclude_record"`
+    Status        CheckinStatus         `json:"status"`
 }
 
 // CheckinPerson is a person's info in a checkin
@@ -40,6 +42,8 @@ type CheckinPerson struct {
 	Location     string `json:"location"`
 	NationalID   string `json:"national_id"`
 	Image        string `json:"image"`
+	ImageURL     string `json:"image_url"`
+	Group        string `json:"group"`
 }
 
 // CheckinPerson gets CheckinPerson from DBPerson
@@ -50,6 +54,7 @@ func (p *DBPerson) CheckinPerson() *CheckinPerson {
 		Name:         p.Name,
 		Location:     p.Location,
 		NationalID:   p.NationalID,
-		Image:        p.Image,
+		ImageURL:     p.ImageURL,
+		Group:        p.Group,
 	}
 }
