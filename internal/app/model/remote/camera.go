@@ -50,6 +50,7 @@ func AddDevices() {
     for _, c := range cameras {
         pc := &schema.CaptureCamera{
             Device: c.DeviceName,
+            Rtmp: c.Rtmp,
         }
         jsonValue, _ := json.Marshal(pc)
 	    resp, err := http.Post(requestURL,"application/json",  bytes.NewBuffer(jsonValue))
