@@ -27,10 +27,10 @@ func GetImages(id string) (*schema.DBImages, error){
 
 // UpdateImages update a person's images in db
 func UpdateImages(nationalID string, imgs []string) error {
-    updater := schema.DBImages{
+    updater := map[string]schema.DBImages{"$set": schema.DBImages{
         NationalID:     nationalID,
         Images:         imgs,
-    }
+    }}
 	_, err := collection().UpdateOne(context.Background(), map[string]string{"national_id": nationalID}, updater)
     return err
 }

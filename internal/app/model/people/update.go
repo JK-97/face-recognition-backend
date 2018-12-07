@@ -39,7 +39,7 @@ func UpdatePerson(p *schema.Person, images []string) error {
 	if len(images) == 0 {
 		return fmt.Errorf("should send at least one image")
 	}
-	updater := schema.NewDBPerson(p, images[0])
+    updater := map[string]*schema.DBPerson{"$set": schema.NewDBPerson(p, images[0])}
 	_, err := collection().UpdateOne(context.Background(), map[string]string{"_id": p.ID}, updater)
     return err
 }
