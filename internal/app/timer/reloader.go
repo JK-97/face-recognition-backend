@@ -14,11 +14,15 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
-func init() {
+// InitReload run check cameras timer
+func InitReload() {
     cfg := config.Config()
     appid := cfg.GetString("appid")
     if appid != "" {
+        log.Info("HAS APPID")
         RegisterHandler(autoReloadTimer)
+    } else {
+        log.Info("NO APPID")
     }
 }
 
@@ -28,6 +32,7 @@ func autoReloadTimer(bool) (int64, error) {
         log.Info("checking is running, won't autoReloadTimer")
         return 300, nil
     } else {
+        log.Info("reload cameras")
         return 300, reloadCameras()
     }
 }
