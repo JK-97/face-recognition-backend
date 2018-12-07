@@ -41,3 +41,9 @@ func AddCamera(h *schema.Camera) error {
 	_, err = collection().InsertOne(context.Background(), h)
 	return err
 }
+
+// RemoveCameras remove all device in db
+func RemoveCameras() error {
+	_, err := collection().DeleteMany(context.Background(), nil)
+	return err
+}
