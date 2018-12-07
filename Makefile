@@ -28,8 +28,6 @@ build:
 	@echo "building ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
 	export CGO_ENABLED=0; \
-	export http_proxy=socks5://127.0.0.1:1080; \
-	export https_proxy=socks5://127.0.0.1:1080; \
 	go build -ldflags "-X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.BuildDate=${BUILD_DATE}" -o bin/${BIN_NAME}
 
 get-deps:
