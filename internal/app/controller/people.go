@@ -67,7 +67,7 @@ func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
     }
 
     if fullImage != "" {
-        imgs, err := images.GetImages(dbPerson.NationalID)
+        imgs, err := images.GetImages(dbPerson.ID)
         if err != nil {
             Error(w, err, http.StatusNotFound)
             return
@@ -104,7 +104,7 @@ func CheckinPeoplePUT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    err = images.UpdateImages(p.Person.NationalID, p.Images)
+    err = images.UpdateImages(p.Person.ID, p.Images)
     if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
@@ -137,7 +137,7 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    err = images.AddImages(p.NationalID, p.Images)
+    err = images.AddImages(p.ID, p.Images)
     if err != nil {
 		Error(w, err, http.StatusInternalServerError)
         return 
@@ -171,7 +171,7 @@ func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
 
 	var peopleRet = []*schema.DBPerson{}
 	for _, p := range people {
-		if _, ok := excludePeople[p.NationalID]; !ok {
+		if _, ok := excludePeople[p.ID]; !ok {
 			peopleRet = append(peopleRet, p)	
 		}
 	}

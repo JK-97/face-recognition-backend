@@ -125,7 +125,7 @@ func dB2CheckinPeople(l []*schema.DBPerson, filter *map[string]int64) []*schema.
         }
     } else {
         for _, p := range l {
-            if _, ok := (*filter)[p.NationalID]; !ok {
+            if _, ok := (*filter)[p.ID]; !ok {
                 res = append(res, p.CheckinPerson())
             }
         }
