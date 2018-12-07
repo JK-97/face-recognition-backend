@@ -73,7 +73,7 @@ func ExcludeRecordPOST(w http.ResponseWriter, r *http.Request) {
 
     log.Info("people: %v", people)
 	for _, r := range excludeRecord.People {
-		if _, ok := people[r.NationalID]; ok {
+		if _, ok := people[r.ID]; ok {
 			Error(w, err, http.StatusNotAcceptable)
 			return
 		}

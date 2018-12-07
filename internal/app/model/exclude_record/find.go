@@ -107,7 +107,7 @@ func MakeExcludePeopleSet(records []*schema.DBExcludeRecord) map[string]int64 {
 		excludeTime := records[index].ExcludeTime
 		people := records[index].People
 		for i := 0; i < len(people); i++ {
-			result[people[i].NationalID] = excludeTime
+			result[people[i].ID] = excludeTime
 		}
 	}
     return result

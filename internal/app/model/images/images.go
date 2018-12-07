@@ -16,7 +16,7 @@ func collection() *mongo.Collection {
 
 // GetImages return a person full images
 func GetImages(id string) (*schema.DBImages, error){
-	doc := collection().FindOne(context.Background(), map[string]string{"national_id": id})
+	doc := collection().FindOne(context.Background(), map[string]string{"pid": id})
 	result := &schema.DBImages{}
 	err := doc.Decode(&result)
     if err != nil {
@@ -26,21 +26,21 @@ func GetImages(id string) (*schema.DBImages, error){
 }
 
 // UpdateImages update a person's images in db
-func UpdateImages(nationalID string, imgs []string) error {
+func UpdateImages(ID string, imgs []string) error {
     updater := map[string]schema.DBImages{"$set": schema.DBImages{
-        NationalID:     nationalID,
-        Images:         imgs,
+        PID:     ID,
+        Images: imgs,
     }}
-	_, err := collection().UpdateOne(context.Background(), map[string]string{"national_id": nationalID}, updater)
+	_, err := collection().UpdateOne(context.Background(), map[string]string{"pid": ID}, updater)
     return err
 }
 
 // AddImages add a person's image in db
-func AddImages(nationalID string, imgs []string) error {
+func AddImages(id string, imgs []string) error {
 	uid, _ := uuid.NewUUID()
     doc := schema.DBImages{
         ID:             uid.String(),
-        NationalID:     nationalID,
+        PID:            id,
         Images:         imgs,
     }
 	_, err := collection().InsertOne(context.Background(), doc)
