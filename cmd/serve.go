@@ -45,7 +45,7 @@ to quickly create a Cobra application.`,
 		}()
 
 		go func() {
-			timer.RunNextTimer()	
+			timer.Init()
 		}()
 
         go func() {

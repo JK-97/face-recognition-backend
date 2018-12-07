@@ -47,20 +47,21 @@ var checkTimer *time.Timer
 var handlerQueue = &JobQueue{}
 var timerMutex = &sync.Mutex{}
 
+// Init Timer
+func Init() {
+    InitReload()
+    for _, i := range *handlerQueue {
+        i.timestamp, _ = i.cb(true)
+    }
+    heap.Init(handlerQueue)
+    RunNextTimer()
+}
+
+
 // RunNextTimer run timer
 func RunNextTimer() {
+
 	if len(*handlerQueue) != 0 {
-
-        for handlerQueue.LastTimestamp() == -1 {
-            timerMutex.Lock()
-            job := heap.Pop(handlerQueue).(*Job)
-            timerMutex.Unlock()
-            job.timestamp, _ = job.cb(true)
-            timerMutex.Lock()
-		    handlerQueue.Push(job)
-            timerMutex.Unlock()
-        }
-
 		checkTimer = time.NewTimer(time.Second * handlerQueue.LastTimestamp())
 		go func() {
 			<-checkTimer.C
