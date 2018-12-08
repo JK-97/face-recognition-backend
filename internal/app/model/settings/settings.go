@@ -13,6 +13,7 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/timer"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
@@ -85,7 +86,7 @@ func nextCheckinTime() int64 {
         nextTime = 1
     }
 
-    return nextTime
+    return util.NowMilli() + nextTime * 1000
 }
 
 // AutoCheckinTimer auto checking
@@ -100,6 +101,9 @@ func AutoCheckinTimer(init bool) (int64, error) {
     // TODO maybe need try more time
     id, err := checkin.DefaultCheckiner.Start()
     if err == nil {
+
+        log.Info("Doing AutoCheckinTimer")
+
         waitTimer := time.NewTimer(30 * time.Second)
         go func() {
             <- waitTimer.C
