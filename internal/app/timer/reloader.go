@@ -12,6 +12,7 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/device"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 )
 
 // InitReload run check cameras timer
@@ -30,10 +31,10 @@ func autoReloadTimer(bool) (int64, error) {
     log.Info("start autoReloadTimer")
     if checkin.DefaultCheckiner.Status() == schema.CHECKING {
         log.Info("checking is running, won't autoReloadTimer")
-        return 300, nil
+        return util.NowMilli() + 300000, nil
     } else {
         log.Info("reload cameras")
-        return 300, reloadCameras()
+        return util.NowMilli() + 300000, reloadCameras()
     }
 }
 
