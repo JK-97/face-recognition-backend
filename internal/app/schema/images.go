@@ -7,3 +7,9 @@ type DBImages struct {
     NationalID  string `json:"national_id" bson:"national_id"`
     Images      []string `json:"images" bson:"images"`
 }
+
+// DBImagesUpdater
+type DBImagesUpdater struct {
+    PID         string `json:"pid" bson:"pid, omitempty"`
+    Images      []string `json:"images" bson:"images"`
+}
