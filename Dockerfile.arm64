@@ -1,0 +1,6 @@
+FROM scratch
+
+WORKDIR /backend
+COPY ./bin/face-recognition-backend-arm64 .
+
+ENTRYPOINT [ "/backend/face-recognition-backend-arm64" ]
