@@ -76,7 +76,7 @@ func nextCheckinTime() int64 {
     if nowSeconds <= end && nowSeconds >= start {
         dt := nowSeconds - start
         nextTime = s.Interval - (dt - (dt / s.Interval) * s.Interval)
-    } else if nowSeconds < end {
+    } else if nowSeconds < start {
         nextTime = start - nowSeconds
     } else {
         nextTime = 86400 - nowSeconds + start
@@ -106,7 +106,7 @@ func AutoCheckinTimer(init bool) (int64, error) {
 
         waitTimer := time.NewTimer(30 * time.Second)
         go func() {
-            <- waitTimer.C
+            <-waitTimer.C
             t, err := checkin.DefaultCheckiner.Stop(id)
             log.Info("AutoCheckTimer: %d: ", t, err)
         } ()
