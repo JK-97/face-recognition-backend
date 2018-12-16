@@ -73,7 +73,7 @@ func nextCheckinTime() int64 {
     end := s.Endtime.TranslateToSec()
 
     var nextTime int64
-    if nowSeconds <= end && nowSeconds >= start {
+    if nowSeconds <= end - s.Interval && nowSeconds >= start {
         dt := nowSeconds - start
         nextTime = s.Interval - (dt - (dt / s.Interval) * s.Interval)
     } else if nowSeconds < start {
