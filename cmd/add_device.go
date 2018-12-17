@@ -19,15 +19,20 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/device"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 )
 
 // addDeviceCmd represents the test command
 var addDeviceCmd = &cobra.Command{
 	Use:   "add_device",
-	Short: "display_name device_id rtmpaddr",
-	Long: `Add camera devices in database: display_name device_id rtmpaddr`,
-	Args: cobra.MinimumNArgs(3),
+	Short: "display_name device_id rtmpaddr dbaddr",
+	Long: `Add camera devices in database: display_name device_id rtmpaddr dbaddr`,
+	Args: cobra.MinimumNArgs(4),
 	Run: func(cmd *cobra.Command, args []string) {
+
+        cfg := config.Config()
+        cfg.Set("db-addr", args[3])
+
         model.InitDB()
 
         p := schema.Camera{
