@@ -8,9 +8,8 @@ RUN echo $TZ > /etc/timezone && apt-get update && apt-get install -y tzdata && r
 WORKDIR /backend
 COPY ./bin/face-recognition-backend .
 
-# ENTRYPOINT [ "/backend/face-recognition-backend" ]
+ENTRYPOINT [ "/backend/face-recognition-backend" ]
 # CMD [ "sleep 360000" ]
-# CMD [ "serve" ]
 
 # # Build Stage
 # FROM images.jiangxingai.com:5000/face-recognition-backend:1.11 AS build-stage
