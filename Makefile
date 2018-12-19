@@ -36,7 +36,7 @@ build-arm:
 	@echo "GOPATH=${GOPATH}"
 	export CGO_ENABLED=0; \
 	export GOARCH=arm64; \
-	go build -ldflags "-X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.BuildDate=${BUILD_DATE}" -o bin/${BIN_NAME}
+	go build -ldflags "-X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.BuildDate=${BUILD_DATE}" -o bin/${ARM_BIN_NAME}
 
 get-deps:
 	dep ensure
