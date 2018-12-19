@@ -74,7 +74,7 @@ func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
         }
         resp.Images = imgs.Images
     }
-    
+
 	respondJSON(resp, w, r)
 }
 
