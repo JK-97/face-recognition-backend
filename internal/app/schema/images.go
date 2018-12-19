@@ -6,10 +6,13 @@ type DBImages struct {
     PID         string `json:"pid" bson:"pid, omitempty"`
     NationalID  string `json:"national_id" bson:"national_id"`
     Images      []string `json:"images" bson:"images"`
+    Image       string `json:"image" bson:"image"`
+    ImageID     string `json:"image_id" bson:"image_id"`
 }
 
 // DBImagesUpdater
 type DBImagesUpdater struct {
     PID         string `json:"pid" bson:"pid, omitempty"`
     Images      []string `json:"images" bson:"images"`
+    Image       string `json:"image" bson:"image"`
 }
