@@ -48,6 +48,7 @@ func (h *JobQueue) NextTimestamp() time.Duration {
 }
 
 var checkTimer *time.Timer
+var isRunTimer = false
 var handlerQueue = &JobQueue{}
 var timerMutex = &sync.Mutex{}
 
@@ -80,7 +81,13 @@ func RunNextTimer() {
             checkTimer = time.NewTimer(time.Millisecond * waiting)
             go func() {
                 <-checkTimer.C
+                timerMutex.Lock()
+                isRunTimer = true
+                timerMutex.Unlock()
                 DoJob()
+                timerMutex.Lock()
+                isRunTimer = false
+                timerMutex.Unlock()
             }()
         }
 
@@ -120,7 +127,11 @@ func RegisterHandler(cb Callback) *Job {
 // UpdateTimer stop timer and retry
 func UpdateTimer(job *Job, nextTime int64) {
 	log.Info("Timer will stop: try to update")
-	checkTimer.Stop()
+    timerMutex.Lock()
+    if !isRunTimer {
+	    checkTimer.Stop()
+    }
+    timerMutex.Unlock()
 
     if nextTime != 0 {
         job.timestamp = nextTime
