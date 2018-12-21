@@ -51,12 +51,12 @@ package:
 	docker build -t $(IMAGE_NAME):local .
 
 tag: package
-	@echo "Tagging: latest ${VERSION} $(GIT_COMMIT)"
-	docker tag $(IMAGE_NAME):local $(IMAGE_NAME):latest
+	@echo "Tagging: x86_v1.0.0 ${VERSION} $(GIT_COMMIT)"
+	docker tag $(IMAGE_NAME):local $(IMAGE_NAME):x86_v1.0.0
 
 push: tag
-	@echo "Pushing docker image to registry: latest ${VERSION} $(GIT_COMMIT)"
-	docker push $(IMAGE_NAME):latest
+	@echo "Pushing docker image to registry: x86_v1.0.0 ${VERSION} $(GIT_COMMIT)"
+	docker push $(IMAGE_NAME):x86_v1.0.0
 
 clean:
 	@test ! -e bin/${BIN_NAME} || rm bin/${BIN_NAME}
