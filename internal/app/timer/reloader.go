@@ -34,7 +34,7 @@ func autoReloadTimer(bool) (int64, error) {
         return util.NowMilli() + 300000, nil
     } else {
         log.Info("reload cameras")
-        return util.NowMilli() + 300000, reloadCameras()
+        return util.NowMilli() + 5000, reloadCameras()
     }
 }
 
