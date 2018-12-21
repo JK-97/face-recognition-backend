@@ -128,7 +128,7 @@ func RegisterHandler(cb Callback) *Job {
 func UpdateTimer(job *Job, nextTime int64) {
 	log.Info("Timer will stop: try to update")
     timerMutex.Lock()
-    if !isRunTimer {
+    if isRunTimer {
 	    checkTimer.Stop()
     }
     timerMutex.Unlock()
