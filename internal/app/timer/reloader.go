@@ -27,14 +27,17 @@ func InitReload() {
     }
 }
 
-func autoReloadTimer(bool) (int64, error) {
+func autoReloadTimer(init bool) (int64, error) {
     log.Info("start autoReloadTimer")
     if checkin.DefaultCheckiner.Status() == schema.CHECKING {
         log.Info("checking is running, won't autoReloadTimer")
         return util.NowMilli() + 300000, nil
-    } else {
-        log.Info("reload cameras")
+    } else if init {
+        log.Info("reload cameras: true")
         return util.NowMilli() + 5000, reloadCameras()
+    } else {
+        log.Info("reload cameras: false")
+        return util.NowMilli() + 300000, reloadCameras()
     }
 }
 
