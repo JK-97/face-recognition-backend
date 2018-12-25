@@ -30,6 +30,8 @@ func Capture(deviceName string) (string, error) {
 	        resp, err = http.Get(requestURL)
             if err == nil && resp.StatusCode == http.StatusOK {
                 break
+            } else if resp.StatusCode == http.StatusNotFound {
+                AddDevices()
             }
             maxRetry = maxRetry - 1
         }
