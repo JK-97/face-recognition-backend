@@ -62,28 +62,24 @@ func LoadHistoryResult(t int64) error {
 	return nil
 }
 
-func checkin() error {
+func checkin() {
 	devices, _ := device.GetCameras()
 
 	for _, d := range devices {
-		go func(d *schema.Camera) error {
-			img, err := remote.Capture(d.DeviceName)
-			if err != nil {
-                log.Info("device capture is not working: %c", d.DeviceName)
-				return err
-			}
+        img, err := remote.Capture(d.DeviceName)
+        if err != nil {
+            log.Error("device capture is not working: %c", d.DeviceName)
+            continue
+        }
 
-			rcgs, err := remote.Detect(img)
-			if err != nil {
-				return err
-			}
+        rcgs, err := remote.Detect(img)
+        if err != nil {
+            log.Error("detect ai is not working: %c", d.DeviceName)
+            continue
+        }
 
-			for _, rcg := range rcgs {
-				addRcg(rcg)
-			}
-			return nil
-		}(d)
+        for _, rcg := range rcgs {
+            addRcg(rcg)
+        }
 	}
-
-	return nil
 }

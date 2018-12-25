@@ -7,7 +7,6 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 // DefaultCheckiner is the singleton of Checkiner
@@ -29,7 +28,7 @@ type startRespType struct {
 // Checkiner periodically run checkin.
 type Checkiner struct {
 	status  schema.CheckinStatus
-	startCh chan chan startRespType 
+	startCh chan chan startRespType
 	stopCh  chan chan stopRespType
 }
 
@@ -101,7 +100,7 @@ func (c *Checkiner) waitStart() int64 {
 }
 
 func (c *Checkiner) detecting(startTime int64) {
-	ticker := time.NewTicker(500 * time.Millisecond)
+	ticker := time.NewTicker(100 * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
@@ -119,10 +118,7 @@ func (c *Checkiner) detecting(startTime int64) {
 			stopResp <- stopRespType{startTime, nil}
 			return
         case <-ticker.C:
-			err := checkin()
-			if err != nil {
-				log.Error(err)
-			}
+			checkin()
 		}
 	}
 }
