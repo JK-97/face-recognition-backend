@@ -7,6 +7,7 @@ import (
 	"net/http"
     "bytes"
     "encoding/json"
+    "time"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
@@ -23,7 +24,18 @@ func Capture(deviceName string) (string, error) {
 	if err != nil {
 		return "", err
 	} else if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("bad response of remote")
+        var maxRetry = 600; // 10mins
+        for maxRetry == 0 {
+            time.Sleep(1000 * time.Millisecond)
+	        resp, err = http.Get(requestURL)
+            if err == nil && resp.StatusCode == http.StatusOK {
+                break
+            }
+            maxRetry = maxRetry - 1
+        }
+        if maxRetry == 0 {
+            return "", fmt.Errorf("check camera status")
+        }
     }
 
 	b, err := ioutil.ReadAll(resp.Body)
