@@ -25,7 +25,7 @@ func Capture(deviceName string) (string, error) {
 		return "", err
 	} else if resp.StatusCode != http.StatusOK {
         var maxRetry = 600; // 10mins
-        for maxRetry == 0 {
+        for maxRetry != 0 {
             time.Sleep(1000 * time.Millisecond)
 	        resp, err = http.Get(requestURL)
             if resp.StatusCode == http.StatusOK {
