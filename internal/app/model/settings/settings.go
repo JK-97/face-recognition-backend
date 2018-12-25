@@ -66,7 +66,7 @@ func nextCheckinTime() int64 {
     s, err := GetSettings()
     if err != nil {
         log.Warn("nextCheckingTime: ", err)
-        return 0
+        return 9223372036854775807 // max int64
     }
 
     start := s.Starttime.TranslateToSec()
