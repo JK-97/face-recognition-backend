@@ -28,7 +28,7 @@ func Capture(deviceName string) (string, error) {
         for maxRetry == 0 {
             time.Sleep(1000 * time.Millisecond)
 	        resp, err = http.Get(requestURL)
-            if err == nil && resp.StatusCode == http.StatusOK {
+            if resp.StatusCode == http.StatusOK {
                 break
             } else if resp.StatusCode == http.StatusNotFound {
                 AddDevices()
