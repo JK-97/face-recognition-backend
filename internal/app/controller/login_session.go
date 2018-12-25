@@ -85,9 +85,13 @@ func LogoutPOST(w http.ResponseWriter, r *http.Request) {
 func CheckLoginSession(w http.ResponseWriter, r *http.Request) error {
 	ticketCookie, err := r.Cookie("ticket")
     if ticketCookie != nil {
-        t, err := ticket.DecodeTicket(ticketCookie.Value)
-        if err == nil {
-            err = ticket.FindTicket(t.UserName, t.NonceStr)
+        if ticketCookie.Value == "" {
+            err = errors.New("Cookies not set")
+        } else {
+            t, err := ticket.DecodeTicket(ticketCookie.Value)
+            if err == nil {
+                err = ticket.FindTicket(t.UserName, t.NonceStr)
+            }
         }
     } else {
         err = errors.New("Cookies not set")
