@@ -14,10 +14,42 @@ func collection() *mongo.Collection {
 	return model.DB.Collection("images")
 }
 
-// GetImages return a person full images
-func GetImages(id string) (*schema.DBImages, error){
+// GetImageIDs return a person image id list
+func GetImageIDs(pid string)([]string, error) {
     ctx := context.Background()
-	cur, err := collection().Find(ctx, map[string]string{"pid": id})
+	cur, err := collection().Find(ctx, map[string]string{"pid": pid})
+    if err != nil {
+        return nil, err
+    }
+
+    var ids []string
+	for cur.Next(ctx) {
+		dbp := &schema.DBImagesOnlyID{}
+		if err := cur.Decode(dbp); err != nil {
+			return nil, err
+		}
+        ids = append(ids, dbp.ID)
+    }
+    return ids, nil
+}
+
+// GetFullImages return mongo query option with all images
+func GetFullImages(id string) map[string]string {
+    return map[string]string{"pid": id}
+}
+
+// GetSingleImage return mongo query option with single image
+func GetSingleImage(id string, imageID string) map[string]string {
+    return map[string]string{
+        "pid": id,
+        "_id": imageID,
+    }
+}
+
+// GetImages return a person full images
+func GetImages(id string, option map[string]string) (*schema.DBImages, error){
+    ctx := context.Background()
+	cur, err := collection().Find(ctx, option)
     if err != nil {
         return nil, err
     }

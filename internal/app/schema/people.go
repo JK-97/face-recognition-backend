@@ -71,7 +71,8 @@ func (p *DBPerson) Person() Person {
 // CheckinPeoplePOSTReq is request to CheckinPeoplePost
 type CheckinPeoplePOSTReq struct {
 	Person
-	Images []string `json:"images"`
+	Images      []string `json:"images"`
+	ImageIDs    []string `json:"image_ids"`
 }
 
 // FaceRecordsGETResp is response of FaceRecordsGET

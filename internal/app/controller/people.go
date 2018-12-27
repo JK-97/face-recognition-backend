@@ -62,17 +62,28 @@ func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
     }
 
 	fullImage := r.URL.Query().Get("full_images")
+	onlyImageID := r.URL.Query().Get("only_image_id")
+
     resp := schema.CheckinPeoplePOSTReq{
         Person: dbPerson.Person(),
     }
 
     if fullImage != "" {
-        imgs, err := images.GetImages(dbPerson.ID)
-        if err != nil {
-            Error(w, err, http.StatusNotFound)
-            return
+        if onlyImageID == "" {
+            imgs, err := images.GetImages(dbPerson.ID, images.GetFullImages(dbPerson.ID))
+            if err != nil {
+                Error(w, err, http.StatusNotFound)
+                return
+            }
+            resp.Images = imgs.Images
+        } else {
+            ids, err := images.GetImageIDs(dbPerson.ID)
+            if err != nil {
+                Error(w, err, http.StatusNotFound)
+                return
+            }
+            resp.ImageIDs = ids
         }
-        resp.Images = imgs.Images
     }
 
 	respondJSON(resp, w, r)
@@ -172,7 +183,7 @@ func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
 	var peopleRet = []*schema.DBPerson{}
 	for _, p := range people {
 		if _, ok := excludePeople[p.ID]; !ok {
-			peopleRet = append(peopleRet, p)	
+			peopleRet = append(peopleRet, p)
 		}
 	}
 
@@ -186,18 +197,30 @@ func StartRecordingPOST(w http.ResponseWriter, r *http.Request) {
 // CheckinPeopleImageGET returns people image by id
 func CheckinPeopleImageGET(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-	p, err := people.GetPerson(id)
-	if err != nil {
-		Error(w, err, http.StatusInternalServerError)
-		return
-	}
+    image_id := r.URL.Query().Get("image_id")
 
-	by, e := base64.StdEncoding.DecodeString(p.Image)
-    if e != nil {
-		Error(w, err, http.StatusInternalServerError)
-		return
+    var image string
+    if image_id == "" {
+        p, err := people.GetPerson(id)
+        if err != nil {
+            Error(w, err, http.StatusInternalServerError)
+            return
+        }
+        image = p.Image
+    } else {
+        imgs, err := images.GetImages(id, images.GetSingleImage(id, image_id))
+        if err != nil || len(imgs.Images) != 1 {
+            Error(w, err, http.StatusInternalServerError)
+            return
+        }
+        image = imgs.Images[0]
     }
 
+    by, err := base64.StdEncoding.DecodeString(image)
+    if err != nil {
+        Error(w, err, http.StatusInternalServerError)
+        return
+    }
 	w.Header().Set("Content-Type", "image/*")
 	w.Write(by)
 }
