@@ -8,4 +8,4 @@ RUN echo $TZ > /etc/timezone && apt-get update && apt-get install -y tzdata && r
 WORKDIR /backend
 COPY ./bin/face-recognition-backend .
 
-ENTRYPOINT [ "/backend/face-recognition-backend serve" ]
+ENTRYPOINT [ "/backend/face-recognition-backend", "serve" ]
