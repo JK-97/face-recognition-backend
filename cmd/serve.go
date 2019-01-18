@@ -64,7 +64,7 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	serveCmd.PersistentFlags().String("port", "80", "Port to run Application server on")
+	serveCmd.PersistentFlags().String("port", "8000", "Port to run Application server on")
 
 	cfg := config.Config()
 	serveCmd.PersistentFlags().String("db-addr", "mongodb://192.168.3.33", "Mongo db server address")
