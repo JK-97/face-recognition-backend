@@ -71,3 +71,29 @@ func AddDevices() {
         log.Info("Device Post: ", pc, " result: ", resp, " error: ", err)
     }
 }
+
+// OpenRtmp try open devices rtmp at nginx by adm
+func OpenRtmp(openURL string) (string, error) {
+    cond := &schema.OpenCameraReq {
+        Action: "open",
+        Timeout: 1000000,
+    }
+    jsonValue, _ := json.Marshal(cond)
+    resp, err := http.Post(openURL, "application/json", bytes.NewBuffer(jsonValue))
+    if err != nil {
+        return "", err
+    }
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	if resp.StatusCode != 200 {
+        return "", fmt.Errorf("adm service response error: %v %s", resp.StatusCode, b)
+    }
+
+	var result schema.OpenCameraResp
+	json.Unmarshal(b, &result)
+    return result.Data, nil
+}

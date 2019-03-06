@@ -29,5 +29,15 @@ type CamerasResp struct {
     Desc        string  `json:"desc"`
 }
 
+type OpenCameraReq struct {
+    Action      string  `json:"action"`
+    Timeout     int64   `json:"timeout"`
+}
+
+type OpenCameraResp struct {
+    Data        string `json:"data"`
+    Desc        string `json:"desc"`
+}
+
 // CameraListResp is response of get camera list
 type CameraListResp []Camera

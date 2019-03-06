@@ -45,7 +45,12 @@ func reloadCameras() error {
     cfg := config.Config()
     appid := cfg.GetString("appid")
     gatewayAddr := cfg.GetString("gateway-addr")
-    requestURL := fmt.Sprintf("%s/internalapi/v1/%s/device/all", gatewayAddr, appid)
+    hostip := cfg.GetString("hostip")
+
+    // requestURL := fmt.Sprintf("%s/internalapi/v1/%s/device/all", gatewayAddr, appid)
+    requestURL := fmt.Sprintf("%s/internalapi/v1/application/devices?id=%s&node_ip=%s",
+        gatewayAddr, appid, hostip)
+
     resp, err := http.Get(requestURL)
     if err == nil && resp.StatusCode == http.StatusOK {
 	    b, err := ioutil.ReadAll(resp.Body)
@@ -57,6 +62,19 @@ func reloadCameras() error {
         err = json.Unmarshal(b, &p)
         if err != nil {
             return err
+        }
+
+        // 如果不存在 rtmp 流地址， 那么尝试创建一个
+        // TODO ADM local 接口？
+        for _, c:= range p.Data {
+            if c.StreamAddr == "" {
+                openRtmpAddr := fmt.Sprintf("%s/internalapi/v1/%s/device/%s/stream",
+                    gatewayAddr, appid, c.ID)
+                c.StreamAddr, err = remote.OpenRtmp(openRtmpAddr)
+                if  err != nil {
+                    return err
+                }
+            }
         }
 
         device.RemoveCameras()

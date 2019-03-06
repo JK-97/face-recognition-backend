@@ -4,7 +4,6 @@ import (
 	"context"
     "fmt"
     "net/http"
-    "strings"
     "encoding/json"
     "bytes"
     "io/ioutil"
@@ -64,7 +63,7 @@ func touchDB(baseURL string, dbHost string) string {
             panic(err)
         }
         if cresp.StatusCode == http.StatusOK {
-            return fmt.Sprintf("mongodb://%s:17017", host)
+            return fmt.Sprintf("mongodb://%s:17017", dbHost)
         } else {
             panic(fmt.Errorf("check infrastructure for database create"))
         }
