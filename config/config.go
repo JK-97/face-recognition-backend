@@ -52,6 +52,7 @@ func readViperConfig(appName string) *viper.Viper {
     v.BindEnv("gateway-addr", "JX_EDGEBOX_APIGATEWAY")
     v.BindEnv("face-ai-addr", "JX_EDGEBOX_SERVICE_FACE_RECOGNITION")
     v.BindEnv("camera-addr", "JX_EDGEBOX_SERVICE_VIDEO_CAPTURE")
+    v.BindEnv("hostip", "JX_EDGEBOX_HOSTIP")
 
 	// global defaults
 
