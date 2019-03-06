@@ -65,11 +65,10 @@ func reloadCameras() error {
         }
 
         // 如果不存在 rtmp 流地址， 那么尝试创建一个
-        // TODO ADM local 接口？
         for _, c:= range p.Data {
             if c.StreamAddr == "" {
-                openRtmpAddr := fmt.Sprintf("%s/internalapi/v1/%s/device/%s/stream",
-                    gatewayAddr, appid, c.ID)
+                openRtmpAddr := fmt.Sprintf("http://%s/internalapi/v1/%s/device/%s/stream",
+                    hostip, appid, c.ID)
                 c.StreamAddr, err = remote.OpenRtmp(openRtmpAddr)
                 if  err != nil {
                     return err
