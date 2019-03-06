@@ -41,7 +41,7 @@ type InfraDBResp struct {
 // DB is a mongodb database
 var DB *mongo.Database
 
-func touchDB(baseURL string, gw string) string {
+func touchDB(baseURL string, dbHost string) string {
     databaseName := "face_recognition_backend_db"
     queryURL := fmt.Sprintf("%s?name=%s", baseURL, databaseName)
 	resp, err := http.Get(queryURL)
@@ -51,10 +51,9 @@ func touchDB(baseURL string, gw string) string {
         // create database if not exist
         createURL := baseURL
 
-        host := strings.Trim(strings.Split(gw, ":")[1], "/")
         pc := &InfraDBReq{
             Type: "mongo",
-            Host: host,
+            Host: dbHost,
             Port: "17017",
             Name: databaseName,
         }
@@ -100,7 +99,9 @@ func InitDB() {
         // checkout if database exists and addr
         gatewayAddr := cfg.GetString("gateway-addr")
         baseURL := fmt.Sprintf("%s/api/v1/infrastructure/database", gatewayAddr)
-        dbAddr = touchDB(baseURL, gatewayAddr)
+        // host := strings.Trim(strings.Split(gatewayAddr, ":")[1], "/")
+        host := cfg.GetString("hostip")
+        dbAddr = touchDB(baseURL, host)
     }
 
 	client, err := mongo.NewClient(dbAddr)
