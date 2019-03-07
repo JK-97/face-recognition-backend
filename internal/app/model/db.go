@@ -41,7 +41,7 @@ type InfraDBResp struct {
 var DB *mongo.Database
 
 func touchDB(baseURL string, dbHost string) string {
-    databaseName := "face_recognition_backend_db"
+    databaseName := fmt.Sprintf("face_recognition_backend_db_%s", dbHost)
     queryURL := fmt.Sprintf("%s?name=%s", baseURL, databaseName)
 	resp, err := http.Get(queryURL)
     if err != nil {

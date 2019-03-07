@@ -27,7 +27,7 @@ func CheckinGETCurrent(w http.ResponseWriter, r *http.Request) {
 
     if t == 0 {
 	    respondJSON("", w, r)
-        return 
+        return
     }
 
     record := checkin.GetCurrentPeopleSet()
@@ -37,7 +37,7 @@ func CheckinGETCurrent(w http.ResponseWriter, r *http.Request) {
 		return
     }
 
-    data.Timestamp          = t 
+    data.Timestamp          = t
 	data.ExpectedCount, err = people.CountPeople()
     data.Status             = status
 	if err != nil {

@@ -40,13 +40,20 @@ func Capture(deviceName string) (string, error) {
         }
     }
 
+    // base64
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
-
 	encoded := base64.StdEncoding.EncodeToString(b)
 	return encoded, nil
+
+    // raw data
+    // img, _, err := image.Decode(resp.Body)
+    // if err != nil {
+    //     return nil, err
+    // }
+    // return img, nil
 }
 
 // AddDevices add post all device in db to Capture services
