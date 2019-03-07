@@ -70,7 +70,7 @@ func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
 
     if fullImage != "" {
         if onlyImageID == "" {
-            imgs, err := images.GetImages(dbPerson.ID, images.GetFullImages(dbPerson.ID))
+            imgs, err := images.GetImages(dbPerson.ID, "")
             if err != nil {
                 Error(w, err, http.StatusNotFound)
                 return
@@ -151,7 +151,7 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
     err = images.AddImages(p.ID, p.Images)
     if err != nil {
 		Error(w, err, http.StatusInternalServerError)
-        return 
+        return
     }
 }
 
@@ -208,7 +208,7 @@ func CheckinPeopleImageGET(w http.ResponseWriter, r *http.Request) {
         }
         image = p.Image
     } else {
-        imgs, err := images.GetImages(id, images.GetSingleImage(id, image_id))
+        imgs, err := images.GetImages(id, image_id)
         if err != nil || len(imgs.Images) != 1 {
             Error(w, err, http.StatusInternalServerError)
             return
