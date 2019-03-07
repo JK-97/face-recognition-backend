@@ -13,6 +13,7 @@ import (
     "io"
     "bufio"
     "github.com/google/uuid"
+    "strconv"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
@@ -123,7 +124,7 @@ func ListImgs(path string) ([]string, error) {
 // 上传文件过程中， 需要将local path标记为只读, 不能再次开启从远端同步过程
 func SaveImg(img *image.Image, path string, image_seq int) string {
 
-    local := createFileName(path, string(image_seq), "local")
+    local := createFileName(path, strconv.Itoa(image_seq), "local")
     outLocalFile, _ := os.Create(local)
     jpeg.Encode(outLocalFile, *img, nil)
     outLocalFile.Close()
@@ -142,7 +143,7 @@ func SaveImg(img *image.Image, path string, image_seq int) string {
         }
         uploadMutex.Unlock()
 
-        remote := createFileName(path, string(image_seq), "remote")
+        remote := createFileName(path, strconv.Itoa(image_seq), "remote")
         outRemoteFile, _ := os.Create(fmt.Sprintf("%s.%s", remote, checkSuffix))
         jpeg.Encode(outRemoteFile, *img, nil)
         outRemoteFile.Close()
@@ -155,7 +156,7 @@ func SaveImg(img *image.Image, path string, image_seq int) string {
         uploadMutex.Unlock()
     } ()
 
-    return fmt.Sprint("%s.jpeg.%s", image_seq, checkSuffix)
+    return fmt.Sprintf("%s.jpeg.%s", image_seq, checkSuffix)
 }
 
 // RemoveImg 删除远端图像
@@ -182,7 +183,7 @@ func RemoveImg(path string, image_id string) error {
 
 // GetImg read image from file (local or ceph)
 func GetImg(fileName string) (*image.Image, error) {
-    localFile := fmt.Sprint("/data/edgebox/local/%s", fileName)
+    localFile := fmt.Sprintf("/data/edgebox/local/%s", fileName)
     existingImageFile, err := os.Open(localFile)
     if err == nil {
         defer existingImageFile.Close()
@@ -193,7 +194,7 @@ func GetImg(fileName string) (*image.Image, error) {
         return &imageData, nil
     }
 
-    remoteFile := fmt.Sprint("/data/edgebox/remote/%s", fileName)
+    remoteFile := fmt.Sprintf("/data/edgebox/remote/%s", fileName)
     existingImageFile, err = os.Open(remoteFile)
     if err == nil {
         defer existingImageFile.Close()

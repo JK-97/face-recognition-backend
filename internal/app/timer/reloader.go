@@ -47,10 +47,8 @@ func reloadCameras() error {
     gatewayAddr := cfg.GetString("gateway-addr")
     hostip := cfg.GetString("hostip")
 
-    // requestURL := fmt.Sprintf("%s/internalapi/v1/%s/device/all", gatewayAddr, appid)
     requestURL := fmt.Sprintf("%s/internalapi/v1/application/devices?id=%s&node_ip=%s",
         gatewayAddr, appid, hostip)
-
     resp, err := http.Get(requestURL)
     if err == nil && resp.StatusCode == http.StatusOK {
 	    b, err := ioutil.ReadAll(resp.Body)
@@ -67,7 +65,7 @@ func reloadCameras() error {
         // 如果不存在 rtmp 流地址， 那么尝试创建一个
         for _, c:= range p.Data {
             if c.StreamAddr == "" {
-                openRtmpAddr := fmt.Sprintf("http://%s/internalapi/v1/%s/device/%s/stream",
+                openRtmpAddr := fmt.Sprintf("http://%s:9999/internalapi/v1/%s/device/%s/stream",
                     hostip, appid, c.ID)
                 c.StreamAddr, err = remote.OpenRtmp(openRtmpAddr)
                 if  err != nil {
@@ -86,5 +84,26 @@ func reloadCameras() error {
         }
         remote.AddDevices()
     }
+
+    // TEST CODE
+    // # device.RemoveCameras()
+
+    // # deviceID := "5c80d94c33a59a1e5c5ba1a5"
+    // # openRtmpAddr := fmt.Sprintf("http://%s:9999/internalapi/v1/%s/device/%s/stream",
+    // #     hostip, appid, deviceID)
+    // # StreamAddr, err := remote.OpenRtmp(openRtmpAddr)
+
+    // # log.Info("%s", StreamAddr)
+
+    // # if  err != nil {
+    // #     return err
+    // # }
+    // # device.AddCamera(&schema.Camera{
+    // #     Name: "4.11test",
+    // #     Rtmp: StreamAddr,
+    // #     DeviceName: deviceID,
+    // # })
+    // # remote.AddDevices()
+
     return err
 }
