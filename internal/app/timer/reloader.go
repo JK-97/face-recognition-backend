@@ -47,8 +47,11 @@ func reloadCameras() error {
     gatewayAddr := cfg.GetString("gateway-addr")
     hostip := cfg.GetString("hostip")
 
-    requestURL := fmt.Sprintf("%s/internalapi/v1/application/devices?id=%s&node_ip=%s",
+    requestURL := fmt.Sprintf("%s/internalapi/v1/applications/devices?id=%s&node_ip=%s",
         gatewayAddr, appid, hostip)
+
+    log.Info("request for new stream: %v", requestURL)
+
     resp, err := http.Get(requestURL)
     if err == nil && resp.StatusCode == http.StatusOK {
 	    b, err := ioutil.ReadAll(resp.Body)
@@ -62,12 +65,17 @@ func reloadCameras() error {
             return err
         }
 
+        log.Info("new stream response: %v", p)
+
         // 如果不存在 rtmp 流地址， 那么尝试创建一个
         for _, c:= range p.Data {
             if c.StreamAddr == "" {
                 openRtmpAddr := fmt.Sprintf("http://%s:9999/internalapi/v1/%s/device/%s/stream",
                     hostip, appid, c.ID)
-                c.StreamAddr, err = remote.OpenRtmp(openRtmpAddr)
+                streamAddr, err := remote.OpenRtmp(openRtmpAddr)
+                c.StreamAddr = streamAddr
+
+                log.Info("new stream response: %v", c.StreamAddr)
                 if  err != nil {
                     return err
                 }
