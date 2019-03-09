@@ -7,10 +7,11 @@ import (
     "encoding/json"
     "bytes"
     "io/ioutil"
-    "strings"
+    // "strings"
 
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 
@@ -45,6 +46,8 @@ func touchDB(baseURL string, dbHost string) string {
     databaseName := fmt.Sprintf("face_recognition_backend_db_%s", dbHost)
     queryURL := fmt.Sprintf("%s?name=%s", baseURL, databaseName)
 	resp, err := http.Get(queryURL)
+    log.Info("start touchDB: %v %v", databaseName, queryURL)
+
     if err != nil {
 		panic(err)
     } else if resp.StatusCode == http.StatusNotFound {
@@ -100,8 +103,8 @@ func InitDB() {
         // checkout if database exists and addr
         gatewayAddr := cfg.GetString("gateway-addr")
         baseURL := fmt.Sprintf("%s/api/v1/infrastructure/database", gatewayAddr)
-        host := strings.Trim(strings.Split(gatewayAddr, ":")[1], "/")
-        // host := cfg.GetString("hostip")
+        // host := strings.Trim(strings.Split(gatewayAddr, ":")[1], "/")
+        host := cfg.GetString("hostip")
         dbAddr = touchDB(baseURL, host)
     }
 
