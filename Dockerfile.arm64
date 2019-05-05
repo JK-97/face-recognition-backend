@@ -6,6 +6,6 @@ ENV TZ Asia/Shanghai
 RUN echo $TZ > /etc/timezone && apt-get update && apt-get install -y tzdata && rm /etc/localtime && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &&  dpkg-reconfigure -f noninteractive tzdata && apt-get clean
 
 WORKDIR /backend
-COPY ./bin/face-recognition-backend-arm64 .
+COPY ./bin/face-recognition-backend .
 
-ENTRYPOINT [ "/backend/face-recognition-backend-arm64",  "serve"]
+ENTRYPOINT [ "/backend/face-recognition-backend",  "serve"]
