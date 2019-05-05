@@ -47,7 +47,7 @@ func UpdatePerson(p *schema.Person, images []string) error {
 	}
 
     updater := map[string]*schema.DBPerson{"$set": schema.NewDBPerson(p, images[0])}
-	_, err := collection().UpdateOne(context.Background(), map[string]string{"_id": p.ID}, updater)
+	_, err = collection().UpdateOne(context.Background(), map[string]string{"_id": p.ID}, updater)
     return err
 }
 
