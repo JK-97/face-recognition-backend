@@ -1,7 +1,7 @@
 .PHONY: build build-alpine clean test help default
 
 BIN_NAME=face-recognition-backend
-ARM_BIN_NAME=face-recognition-backend-arm64
+ARM_BIN_NAME=face-recognition-backend
 
 VERSION := $(shell grep "const Version " version/version.go | sed -E 's/.*"(.+)"$$/\1/')
 GIT_COMMIT=$(shell git rev-parse HEAD)
