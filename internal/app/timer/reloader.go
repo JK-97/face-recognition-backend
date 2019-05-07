@@ -17,14 +17,7 @@ import (
 
 // InitReload run check cameras timer
 func InitReload() {
-    cfg := config.Config()
-    appid := cfg.GetString("appid")
-    if appid != "" {
-        log.Info("HAS APPID")
-        RegisterHandler(autoReloadTimer)
-    } else {
-        log.Info("NO APPID")
-    }
+    RegisterHandler(autoReloadTimer)
 }
 
 func autoReloadTimer(init bool) (int64, error) {
@@ -92,26 +85,6 @@ func reloadCameras() error {
         }
         remote.AddDevices()
     }
-
-    // TEST CODE
-    // # device.RemoveCameras()
-
-    // # deviceID := "5c80d94c33a59a1e5c5ba1a5"
-    // # openRtmpAddr := fmt.Sprintf("http://%s:9999/internalapi/v1/%s/device/%s/stream",
-    // #     hostip, appid, deviceID)
-    // # StreamAddr, err := remote.OpenRtmp(openRtmpAddr)
-
-    // # log.Info("%s", StreamAddr)
-
-    // # if  err != nil {
-    // #     return err
-    // # }
-    // # device.AddCamera(&schema.Camera{
-    // #     Name: "4.11test",
-    // #     Rtmp: StreamAddr,
-    // #     DeviceName: deviceID,
-    // # })
-    // # remote.AddDevices()
 
     return err
 }

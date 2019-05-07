@@ -41,27 +41,6 @@ func ResetCurrentPeopleSet() {
 	recordMutex.Unlock()
 }
 
-func GetCurrentPeopleSet() []string {
-	recordMutex.Lock()
-	l := list(&currentRecord, countThres)
-	recordMutex.Unlock()
-	return l
-}
-
-// LoadHistoryResult load history checkin recordset into memory
-func LoadHistoryResult(t int64) error {
-	h, err := GetHistory(t)
-	if err != nil {
-		return err
-	}
-	recordMutex.Lock()
-	for _, v := range h.Record {
-		currentRecord[v] = countThres
-	}
-	recordMutex.Unlock()
-	return nil
-}
-
 func checkin() {
 	devices, _ := device.GetCameras()
 

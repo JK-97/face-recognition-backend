@@ -190,10 +190,6 @@ func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
 	respondJSON(peopleRet, w, r)
 }
 
-// StartRecordingPOST returns ok if ready to capture images
-func StartRecordingPOST(w http.ResponseWriter, r *http.Request) {
-}
-
 // CheckinPeopleImageGET returns people image by id
 func CheckinPeopleImageGET(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
