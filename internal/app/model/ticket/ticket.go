@@ -51,7 +51,7 @@ func DecodeTicket(ticketStr string) (*schema.UserTicket, error) {
 // FindTicket return ticket in database
 func FindTicket(userName string, nonceStr string) error {
 	_, err := collection().Find(context.Background(), map[string]string{
-        "username": userName, 
+        "username": userName,
         "nonce_str": nonceStr,
     })
     return err

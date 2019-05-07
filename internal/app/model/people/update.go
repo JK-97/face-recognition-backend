@@ -27,9 +27,7 @@ func AddPerson(p *schema.Person, images []string) error {
 		return err
 	}
 
-	p.ID = personID
-	dbp := schema.NewDBPerson(p, images[0])
-
+	dbp := schema.NewDBPerson(p, personID)
 	_, err = collection().InsertOne(context.Background(), dbp)
     return err
 }
@@ -40,13 +38,13 @@ func UpdatePerson(p *schema.Person, images []string) error {
 		return fmt.Errorf("should send at least one image")
 	}
 
-        personID := p.ID
+    personID := p.ID
 	err := remote.Record(personID, images)
 	if err != nil {
 		return err
 	}
 
-    updater := map[string]*schema.DBPerson{"$set": schema.NewDBPerson(p, images[0])}
+    updater := map[string]*schema.DBPerson{"$set": schema.NewDBPerson(p, personID)}
 	_, err = collection().UpdateOne(context.Background(), map[string]string{"_id": p.ID}, updater)
     return err
 }

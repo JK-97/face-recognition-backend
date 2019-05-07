@@ -13,15 +13,6 @@ func collection() *mongo.Collection {
 	return model.DB.Collection("people")
 }
 
-// CountPeople counts people in db
-func CountPeople() (int, error) {
-	num, err := collection().Count(context.Background(), nil)
-	if err != nil {
-		return 0, err
-	}
-	return int(num), nil
-}
-
 // GetPerson get a person by id in db
 func GetPerson(id string) (*schema.DBPerson, error) {
 	doc := collection().FindOne(context.Background(), map[string]string{"_id": id})
@@ -33,27 +24,11 @@ func GetPerson(id string) (*schema.DBPerson, error) {
 	return result, nil
 }
 
-// NewFilterPresent creates a filter for present people in checkin
-func NewFilterPresent(idsIn []string) map[string]interface{} {
-	filter := make(map[string]interface{})
-	filter["_id"] = map[string][]string{"$in": idsIn}
-	return filter
-}
-
-// NewFilterAbsent creates a filter for absent people in checkin
-func NewFilterAbsent(idsNotIn []string, createdBefore int64) map[string]interface{} {
-	filter := make(map[string]interface{})
-	filter["_id"] = map[string][]string{"$nin": idsNotIn}
-	filter["created_time"] = map[string]int64{"$lt": createdBefore}
-	return filter
-}
-
-// GetPeople gets list of people in db
 func GetPeople(filter map[string]interface{}, limit int, skip int) ([]*schema.DBPerson, error) {
 	opt := options.Find().
 		SetLimit(int64(limit)).
 		SetSkip(int64(skip)).
-		SetSort(map[string]int{"created_time": -1})
+		SetSort(map[string]int{"serial_number": -1})
 
 	ctx := context.Background()
 	cur, err := collection().Find(ctx, filter, opt)
