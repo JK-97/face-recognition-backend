@@ -19,13 +19,14 @@ func Routes() http.Handler {
 	// mux.HandleFunc("/api/v1/stop_checkin", controller.StopCheckinPOST)
 
 	// history
-	mux.HandleFunc("/api/v1/checkin_history", controller.CheckinHistoryGET)
+	// mux.HandleFunc("/api/v1/checkin_history", controller.CheckinHistoryGET)
 	mux.HandleFunc("/api/v1/checkin", controller.CheckinGET) // ?timestamp=xxxx
-	mux.HandleFunc("/face/recognition", controller.CheckinRangeGET) // ?cameraId=xxx&start_time=xxx&end_time=xxx
+	mux.HandleFunc("/face/recognition", controller.CheckinRangeGET) // ?camera_id=xxx&start_time=xxx&end_time=xxx
 
 	// people
 	mux.HandleFunc("/api/v1/face_records", controller.FaceRecordsGET)
-	mux.HandleFunc("/api/v1/checkin_people", controller.CheckinPeopleGETPOSTDELETEGETPUT) // ?id=xxx&full_images=1
+	mux.HandleFunc("/api/v1/checkin_people", controller.CheckinPeoplePOSTDELETEGETPUT) // ?id=xxx&full_images=1
+	mux.HandleFunc("/api/v1/checkin_people_list", controller.CheckinPeopleListGET)
 	// get image
 	mux.HandleFunc("/api/v1/checkin_people_image", controller.CheckinPeopleImageGET) // ?id=
 	// GET response [{}]

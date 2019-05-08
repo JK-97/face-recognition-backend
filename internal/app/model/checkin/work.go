@@ -41,6 +41,13 @@ func ResetCurrentPeopleSet() {
 	recordMutex.Unlock()
 }
 
+func GetCurrentPeopleSet() []string {
+	recordMutex.Lock()
+	l := list(&currentRecord, countThres)
+	recordMutex.Unlock()
+	return l
+}
+
 func checkin() {
 	devices, _ := device.GetCameras()
 

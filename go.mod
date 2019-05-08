@@ -13,6 +13,7 @@ require (
 	github.com/spf13/viper v1.2.0
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
+	go.mongodb.org/mongo-driver v1.0.1
 	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16 // indirect
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce

@@ -7,15 +7,12 @@ import (
 	"image/jpeg"
 	"io/ioutil"
 	"strings"
-    "sync"
     "fmt"
     "os"
     "io"
     "bufio"
     "github.com/google/uuid"
     "strconv"
-
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 func createFileName(path string, uid string, mode string) string {
