@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/exclude_record"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/images"
@@ -64,8 +63,8 @@ func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
 	fullImage := r.URL.Query().Get("full_images")
 	onlyImageID := r.URL.Query().Get("only_image_id")
 
-    resp := schema.CheckinPeoplePOSTReq{
-        Person: dbPerson.Person(),
+    resp := schema.CheckinPeopleGETResp{
+        Person: *dbPerson,
     }
 
     if fullImage != "" {
@@ -75,7 +74,7 @@ func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
                 Error(w, err, http.StatusNotFound)
                 return
             }
-            resp.Images = imgs.Images
+            resp.Images = imgs
         } else {
             ids, err := images.GetImageIDs(dbPerson.ID)
             if err != nil {
@@ -102,7 +101,7 @@ func CheckinPeoplePUT(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p schema.CheckinPeoplePOSTReq
+	var p schema.CheckinPeoplePUTReq
 	err = json.Unmarshal(b, &p)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest)
@@ -114,12 +113,6 @@ func CheckinPeoplePUT(w http.ResponseWriter, r *http.Request) {
 		Error(w, err, http.StatusInternalServerError)
 		return
 	}
-
-    err = images.UpdateImages(p.Person.ID, p.Images)
-    if err != nil {
-		Error(w, err, http.StatusInternalServerError)
-		return
-    }
 }
 
 // CheckinPeoplePOST adds a person to checkin people list
@@ -147,12 +140,6 @@ func CheckinPeoplePOST(w http.ResponseWriter, r *http.Request) {
 		Error(w, err, http.StatusInternalServerError)
 		return
 	}
-
-    err = images.AddImages(p.ID, p.Images)
-    if err != nil {
-		Error(w, err, http.StatusInternalServerError)
-        return
-    }
 }
 
 // CheckinPeopleDELETE ?id=xxx delete a checkin people
@@ -167,27 +154,13 @@ func CheckinPeopleDELETE(w http.ResponseWriter, r *http.Request) {
 
 // CheckinPeopleListGET returns checkin people list
 func CheckinPeopleListGET(w http.ResponseWriter, r *http.Request) {
-	exclude := r.URL.Query().Get("exclude")
-
 	people, err := people.GetPeople(nil, 0, 0)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	var excludePeople = make(map[string]int64)
-	if exclude != "" {
-		excludePeople, err = exclude_record.GetExcludePeopleSetNow()
-	}
-
-	var peopleRet = []*schema.DBPerson{}
-	for _, p := range people {
-		if _, ok := excludePeople[p.ID]; !ok {
-			peopleRet = append(peopleRet, p)
-		}
-	}
-
-	respondJSON(peopleRet, w, r)
+	respondJSON(people, w, r)
 }
 
 // CheckinPeopleImageGET returns people image by id
@@ -195,22 +168,12 @@ func CheckinPeopleImageGET(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
     image_id := r.URL.Query().Get("image_id")
 
-    var image string
-    if image_id == "" {
-        p, err := people.GetPerson(id)
-        if err != nil {
-            Error(w, err, http.StatusInternalServerError)
-            return
-        }
-        image = p.Image
-    } else {
-        imgs, err := images.GetImages(id, image_id)
-        if err != nil || len(imgs.Images) != 1 {
-            Error(w, err, http.StatusInternalServerError)
-            return
-        }
-        image = imgs.Images[0]
+    imgs, err := images.GetImages(id, image_id)
+    if err != nil || len(imgs) != 1 {
+        Error(w, err, http.StatusInternalServerError)
+        return
     }
+    image := imgs[0]
 
     by, err := base64.StdEncoding.DecodeString(image)
     if err != nil {

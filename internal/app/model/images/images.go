@@ -2,15 +2,9 @@ package images
 
 import (
 	"fmt"
-	"context"
-	"github.com/mongodb/mongo-go-driver/mongo"
-
-	"github.com/google/uuid"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 )
 
 func getImagePath(pid string) string {
@@ -30,7 +24,7 @@ func GetImageIDs(pid string)([]string, error) {
 }
 
 // GetImages return a person full images or single image
-func GetImages(pid string, image_id string) (*[]string, error) {
+func GetImages(pid string, image_id string) ([]string, error) {
 	var result []string
 
     appImgPath := getImagePath(pid)
@@ -54,7 +48,7 @@ func GetImages(pid string, image_id string) (*[]string, error) {
         if err != nil {
             return nil , err
         }
-        result.Images = append(result.Images, b64Img)
+        result = append(result, b64Img)
     }
     return result, nil
 }
@@ -74,5 +68,5 @@ func UpdateImages(ID string, imgs []string) error {
 
 // AddImages add a person's image in db
 func AddImages(ID string, imgs []string) error {
-    return updateImages(ID, imgs)
+    return UpdateImages(ID, imgs)
 }

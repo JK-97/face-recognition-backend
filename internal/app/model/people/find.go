@@ -46,7 +46,7 @@ func GetPeople(filter map[string]interface{}, limit int, skip int) ([]*schema.DB
 		if err := cur.Decode(dbp); err != nil {
 			return nil, err
 		}
-		result = append(result, schema.NewDBPersonWithImageURL(dbp))
+		result = append(result, dbp)
 	}
 
 	return result, nil
