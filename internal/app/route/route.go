@@ -33,7 +33,7 @@ func Routes() http.Handler {
 
 	// camera
 	mux.HandleFunc("/api/v1/cameras", controller.CamerasGETPOST)
-	// GET [{"name": "", "rtmp": "", "device_name": ""}]
+	// GET [{"name": "", "rtmp": "", "camera_id": ""}]
 	// POST {"name": "rtmp": ""}
 
 	// login

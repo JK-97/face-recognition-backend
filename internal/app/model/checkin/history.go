@@ -6,9 +6,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/mongodb/mongo-go-driver/mongo"
     "go.mongodb.org/mongo-driver/bson"
+
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 type seal struct {
@@ -20,15 +22,17 @@ func collection() *mongo.Collection {
 	return model.DB.Collection("checkin-history")
 }
 
-func saveCheckin(s seal) error {
-    l := GetCurrentPeopleSet()
+func saveCheckinWithDevice(cameraID string, endTime int64) error {
+    l := GetCurrentPeopleSet(cameraID)
 	h := &schema.CheckinHistoryRecord{
-        Timestamp:      s.endTime,
+        Timestamp:      endTime,
         PersonIDS:      l,
+        CameraID:       cameraID,
 	}
 
+    log.Info("saveCheckinWithDevice ", cameraID, ":", endTime, ":", l)
 	uid, err := uuid.NewUUID()
-	if err != nil {
+	if err == nil {
 	    _, err = collection().InsertOne(
             context.Background(),
             schema.NewDBCheckinHistoryRecord(h, uid.String()),
@@ -37,15 +41,40 @@ func saveCheckin(s seal) error {
 	return err
 }
 
+func saveCheckin(s seal) error {
+    devices := GetCurrentDevices()
+    for _, device := range devices {
+        err := saveCheckinWithDevice(device, s.endTime)
+        if err != nil {
+            return err
+        }
+    }
+    return nil
+}
+
 // GetHistoryRecords return all person in set during start_time and end_time
 func GetHistoryRecords(start_time int64, end_time int64, cameraID string) (*schema.CheckinResp, error) {
 	ctx := context.Background()
-    cur, err := collection().Find(ctx, bson.D{
-        {"timestamp", bson.D{
-            {"$gte", start_time},
-            {"$lte", end_time},
-        }},
-    })
+
+    var cond bson.D
+    if cameraID != "" {
+        cond = bson.D{
+            {"timestamp", bson.D{
+                {"$gte", start_time},
+                {"$lte", end_time},
+            }},
+            {"camera_id", cameraID},
+        }
+    } else {
+        cond = bson.D{
+            {"timestamp", bson.D{
+                {"$gte", start_time},
+                {"$lte", end_time},
+            }},
+        }
+    }
+
+    cur, err := collection().Find(ctx, cond)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +94,7 @@ func GetHistoryRecords(start_time int64, end_time int64, cameraID string) (*sche
 
     ret := &schema.CheckinResp{}
     for pid, _ := range personIDS {
-        person, err := people.GetPerson(pid)
+        person, err := people.GetPerson(people.PersonFilter(pid, ""))
         if err != nil {
             return nil, err
         }

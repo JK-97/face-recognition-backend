@@ -38,7 +38,7 @@ var addDeviceCmd = &cobra.Command{
         p := schema.Camera{
             Name: args[0],
             Rtmp: args[2],
-            DeviceName: args[1],
+            CameraID: args[1],
         }
         device.AddCamera(&p)
 	},

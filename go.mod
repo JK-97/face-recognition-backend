@@ -7,6 +7,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.1.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/jasonlvhit/gocron v0.0.0-20190402024347-5bcdd9fcfa9b
 	github.com/mongodb/mongo-go-driver v0.0.18
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cobra v0.0.3

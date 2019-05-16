@@ -16,10 +16,10 @@ import (
 )
 
 // Capture an image from camera server
-func Capture(deviceName string) (string, error) {
+func Capture(cameraID string) (string, error) {
 	cfg := config.Config()
 	cameraAddr := cfg.GetString("camera-addr")
-	requestURL := fmt.Sprintf("%s?device=%s", cameraAddr, deviceName)
+	requestURL := fmt.Sprintf("%s?device=%s", cameraAddr, cameraID)
 	resp, err := http.Get(requestURL)
 	if err != nil {
 		return "", err
@@ -70,7 +70,7 @@ func AddDevices() {
 
     for _, c := range cameras {
         pc := &schema.CaptureCamera{
-            Device: c.DeviceName,
+            Device: c.CameraID,
             Rtmp: c.Rtmp,
         }
         jsonValue, _ := json.Marshal(pc)

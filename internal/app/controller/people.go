@@ -16,8 +16,8 @@ import (
 
 // FaceRecordsGET returns one captured image
 func FaceRecordsGET(w http.ResponseWriter, r *http.Request) {
-	deviceName := r.URL.Query().Get("device_name")
-	b, err := remote.Capture(deviceName)
+	cameraID := r.URL.Query().Get("camera_id")
+	b, err := remote.Capture(cameraID)
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError)
 		return
@@ -49,12 +49,13 @@ func CheckinPeoplePOSTDELETEGETPUT(w http.ResponseWriter, r *http.Request) {
 // CheckinPeopleGET returns person in db 
 func CheckinPeopleGET(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
-    if id == "" {
-		Error(w, fmt.Errorf("Required args: id"), http.StatusBadRequest)
+    serialNumber := r.URL.Query().Get("serial_number")
+    if id == "" && serialNumber == "" {
+		Error(w, fmt.Errorf("Required args: id or serial_number"), http.StatusBadRequest)
 		return
     }
 
-    dbPerson, err := people.GetPerson(id)
+    dbPerson, err := people.GetPerson(people.PersonFilter(id, serialNumber))
     if err != nil {
 		Error(w, err, http.StatusNotFound)
 		return

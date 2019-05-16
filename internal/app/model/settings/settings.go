@@ -13,14 +13,50 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/checkin"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/timer"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
-var registerSettingsTimer = timer.RegisterHandler(AutoCheckinTimer)
+func init() {
+    timer.UpdateScheduler(ReloadSettings, 300)
+}
 
 func collection() *mongo.Collection {
 	return model.DB.Collection("settings")
+}
+
+// ReloadSettings read configuration from db, start checkin
+func ReloadSettings() {
+    settings, err := GetSettings()
+    if err == nil {
+        schedRecognition(settings)
+    } else {
+        timer.UpdateScheduler(ReloadSettings, 300)
+    }
+}
+
+func schedRecognition(s *schema.SettingsReq) {
+    now := time.Now()
+    nowSeconds := int64(now.Hour() * 3600 + now.Minute() * 60 + now.Second())
+    start := s.Starttime.TranslateToSec()
+    end := s.Endtime.TranslateToSec()
+    var nextTime int64
+
+    if s.Interval == 0 {
+        nextTime = 0
+    } else if nowSeconds <= end - s.Interval && nowSeconds >= start {
+        dt := nowSeconds - start
+        nextTime = s.Interval - (dt - (dt / s.Interval) * s.Interval)
+    } else if nowSeconds < start {
+        nextTime = start - nowSeconds
+    } else {
+        nextTime = 86400 - nowSeconds + start
+    }
+
+    if nextTime == 0 {
+        autoCheckin(s.Duration)
+    } else {
+        timer.UpdateScheduler(ReloadSettings, nextTime)
+    }
 }
 
 // GetSettings get settings
@@ -55,62 +91,25 @@ func UpdateSettings(h *schema.SettingsReq) error {
         map[string]schema.Settings{"$set": d},
         opt)
 
-    timer.UpdateTimer(registerSettingsTimer, nextCheckinTime())
+    if err == nil {
+        ReloadSettings()
+    }
 	return err
 }
 
-func nextCheckinTime() int64 {
-    now := time.Now()
-    nowSeconds := int64(now.Hour() * 3600 + now.Minute() * 60 + now.Second())
-
-    s, err := GetSettings()
-    if err != nil {
-        log.Warn("nextCheckingTime: ", err)
-        return 100 * 365 * 86400 * 1000 + util.NowMilli()
-    }
-
-    start := s.Starttime.TranslateToSec()
-    end := s.Endtime.TranslateToSec()
-
-    var nextTime int64
-    if nowSeconds <= end - s.Interval && nowSeconds >= start {
-        dt := nowSeconds - start
-        nextTime = s.Interval - (dt - (dt / s.Interval) * s.Interval)
-    } else if nowSeconds < start {
-        nextTime = start - nowSeconds
-    } else {
-        nextTime = 86400 - nowSeconds + start
-    }
-
-    if nextTime == 0 {
-        nextTime = 1
-    }
-
-    return util.NowMilli() + nextTime * 1000
-}
-
-// AutoCheckinTimer auto checking
-func AutoCheckinTimer(init bool) (int64, error) {
-
-    if init {
-        return nextCheckinTime(), nil
-    }
-
-    log.Info("start AutoCheckinTimer")
-
-    // TODO maybe need try more time
+// autoCheckinTimer auto checking
+func autoCheckin(duration int) {
+    log.Info("autoCheckin start")
     id, err := checkin.DefaultCheckiner.Start()
     if err == nil {
+        log.Info("autoCheckin duration: ", duration)
+        waitTimer := time.NewTimer(time.Duration(duration) * time.Second)
 
-        log.Info("Doing AutoCheckinTimer")
-
-        waitTimer := time.NewTimer(30 * time.Second)
         go func() {
             <-waitTimer.C
             t, err := checkin.DefaultCheckiner.Stop(id)
-            log.Info("AutoCheckTimer: %d: ", t, err)
+            log.Info("autoCheckin stop ", t, err)
+            ReloadSettings()
         } ()
     }
-
-    return nextCheckinTime(), err
 }

@@ -5,7 +5,7 @@ type Camera struct {
 	ID         string `json:"id" bson:"_id"`
 	Name       string `json:"name" bson:"name"`
 	Rtmp       string `json:"rtmp" bson:"rtmp"`
-	DeviceName string `json:"device_name" bson:"device_name"`
+	CameraID   string `json:"camera_id" bson:"camera_id"`
 }
 
 // CaptureCamera POST all device to video_capture
