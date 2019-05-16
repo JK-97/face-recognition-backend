@@ -19,6 +19,7 @@ type Settings struct {
     Starttime  CheckinTimestamp `json:"starttime" bson:"starttime"`
     Endtime    CheckinTimestamp `json:"endtime" bson:"endtime"`
     Interval   int64    `json:"interval" bson:"interval"`
+    Duration   int      `json:"duration" bson:"duration"`
 }
 
 // SettingsReq is a settings in http req/resp
@@ -26,6 +27,7 @@ type SettingsReq struct {
     Starttime  CheckinTimestamp `json:"starttime" bson:"starttime"`
     Endtime    CheckinTimestamp `json:"endtime" bson:"endtime"`
     Interval   int64    `json:"interval" bson:"interval"`
+    Duration   int      `json:"duration" bson:"duration"`
 }
 
 // SettingsToReq translate db to http
@@ -34,6 +36,7 @@ func SettingsToReq(d *Settings) *SettingsReq {
         Starttime: d.Starttime,
         Endtime: d.Endtime,
         Interval: d.Interval,
+        Duration: d.Duration,
     }
 }
 
@@ -44,5 +47,6 @@ func ReqToSettings(d *SettingsReq) Settings {
         Starttime:  d.Starttime,
         Endtime:    d.Endtime,
         Interval: d.Interval,
+        Duration: d.Duration,
     }
 }
