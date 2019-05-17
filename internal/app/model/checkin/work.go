@@ -92,6 +92,7 @@ func checkin() {
             continue
         }
 
+        log.Info("checkin result: ", d.CameraID, "[", rcgs, "]")
         for _, rcg := range rcgs {
             addRcg(rcg, d.CameraID)
         }

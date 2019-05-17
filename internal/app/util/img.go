@@ -15,8 +15,10 @@ import (
     "strconv"
 )
 
+var EdgeboxPrefix = "/data/edgebox"
+
 func createFileName(path string, uid string, mode string) string {
-    cpath := fmt.Sprintf("/data/edgebox/%s/%s", mode, path)
+    cpath := fmt.Sprintf("%s/%s/%s", EdgeboxPrefix, mode, path)
     if _, err := os.Stat(cpath); os.IsNotExist(err) {
         os.MkdirAll(cpath, 0755)
     }
@@ -43,7 +45,7 @@ func copyFile(src, dst string) error {
 // ListImgs 获取一个路径下上的所有图片名字列表
 func ListImgs(path string) ([]string, error) {
     var imgs []string
-    var localpath = fmt.Sprintf("/data/edgebox/local/%s", path)
+    var localpath = fmt.Sprintf("%s/local/%s", EdgeboxPrefix, path)
 
     localfiles, err := ioutil.ReadDir(localpath)
     if err != nil {
@@ -69,7 +71,7 @@ func SaveImg(img *image.Image, path string, image_seq int) string {
 
 // RemoveImg 删除远端图像
 func RemoveImg(path string, image_id string) error {
-    var localpath = fmt.Sprintf("/data/edgebox/local/%s", path)
+    var localpath = fmt.Sprintf("%s/local/%s", EdgeboxPrefix, path)
     if image_id == "" {
         remotefiles, err := ioutil.ReadDir(localpath)
         if err != nil {
@@ -86,7 +88,7 @@ func RemoveImg(path string, image_id string) error {
 
 // GetImg read image from file (local or ceph)
 func GetImg(fileName string) (*image.Image, error) {
-    localFile := fmt.Sprintf("/data/edgebox/local/%s", fileName)
+    localFile := fmt.Sprintf("%s/local/%s", EdgeboxPrefix, fileName)
     existingImageFile, err := os.Open(localFile)
     if err == nil {
         defer existingImageFile.Close()
