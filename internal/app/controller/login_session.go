@@ -83,6 +83,7 @@ func LogoutPOST(w http.ResponseWriter, r *http.Request) {
 
 // CheckLoginSession check every api call with cookie
 func CheckLoginSession(w http.ResponseWriter, r *http.Request) error {
+
 	ticketCookie, err := r.Cookie("ticket")
     if ticketCookie != nil {
         if ticketCookie.Value == "" {

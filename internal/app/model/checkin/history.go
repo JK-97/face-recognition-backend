@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mongodb/mongo-go-driver/mongo"
-    "go.mongodb.org/mongo-driver/bson"
 
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/people"
@@ -56,22 +55,14 @@ func saveCheckin(s seal) error {
 func GetHistoryRecords(start_time int64, end_time int64, cameraID string) (*schema.CheckinResp, error) {
 	ctx := context.Background()
 
-    var cond bson.D
+
+    cond := make(map[string]interface{})
+    cond["timestamp"] = map[string]int64 {
+        "$gte": start_time,
+        "$lte": end_time,
+    }
     if cameraID != "" {
-        cond = bson.D{
-            {"timestamp", bson.D{
-                {"$gte", start_time},
-                {"$lte", end_time},
-            }},
-            {"camera_id", cameraID},
-        }
-    } else {
-        cond = bson.D{
-            {"timestamp", bson.D{
-                {"$gte", start_time},
-                {"$lte", end_time},
-            }},
-        }
+        cond["camera_id"] = cameraID
     }
 
     cur, err := collection().Find(ctx, cond)
@@ -92,7 +83,11 @@ func GetHistoryRecords(start_time int64, end_time int64, cameraID string) (*sche
         }
 	}
 
-    ret := &schema.CheckinResp{}
+    ret := &schema.CheckinResp{
+        StartTime: start_time,
+        EndTime: end_time,
+        Person: make([]*schema.Person, 0),
+    }
     for pid, _ := range personIDS {
         person, err := people.GetPerson(people.PersonFilter(pid, ""))
         if err != nil {
