@@ -48,11 +48,16 @@ func readViperConfig(appName string) *viper.Viper {
 	v.SetEnvPrefix(appName)
 	v.AutomaticEnv()
 
+    v.BindEnv("appid", "JX_EDGEBOX_APPID")
+    v.BindEnv("gateway-addr", "JX_EDGEBOX_APIGATEWAY")
+    v.BindEnv("face-ai-addr", "JX_EDGEBOX_SERVICE_FACE_RECOGNITION")
+    v.BindEnv("camera-addr", "JX_EDGEBOX_SERVICE_VIDEO_CAPTURE")
+    v.BindEnv("hostip", "JX_EDGEBOX_HOSTIP")
+
 	// global defaults
 
 	v.SetDefault("json_logs", false)
 	v.SetDefault("loglevel", "debug")
-
 	v.SetDefault("app-name", "face-recognition")
 
 	return v

@@ -10,7 +10,7 @@ import (
 func TestRecord() {
 	images := make([]string, 0, 10)
 	for i := 0; i < 20; i++ {
-		image, err := Capture()
+		image, err := Capture("")
 		if err != nil {
 			log.Error(err)
 			return
@@ -27,7 +27,7 @@ func TestRecord() {
 
 // TestDetect calls capture then detect
 func TestDetect() {
-	testImage, _ := Capture()
+	testImage, _ := Capture("")
 	rcgs, err := Detect(testImage)
 	if err != nil {
 		log.Error(err)

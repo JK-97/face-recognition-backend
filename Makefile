@@ -1,6 +1,7 @@
 .PHONY: build build-alpine clean test help default
 
 BIN_NAME=face-recognition-backend
+ARM_BIN_NAME=face-recognition-backend
 
 VERSION := $(shell grep "const Version " version/version.go | sed -E 's/.*"(.+)"$$/\1/')
 GIT_COMMIT=$(shell git rev-parse HEAD)
@@ -30,25 +31,32 @@ build:
 	export CGO_ENABLED=0; \
 	go build -ldflags "-X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.BuildDate=${BUILD_DATE}" -o bin/${BIN_NAME}
 
+build-arm:
+	@echo "building ${BIN_NAME} ${VERSION}"
+	@echo "GOPATH=${GOPATH}"
+	export CGO_ENABLED=0; \
+	export GOARCH=arm64; \
+	go build -ldflags "-X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.BuildDate=${BUILD_DATE}" -o bin/${ARM_BIN_NAME}
+
 get-deps:
 	dep ensure
 
 build-alpine:
 	@echo "building ${BIN_NAME} ${VERSION}"
 	@echo "GOPATH=${GOPATH}"
-	go build -ldflags '-w -linkmode external -extldflags "-static" -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.BuildDate=${BUILD_DATE}' -o bin/${BIN_NAME}
+	go build -ldflags '-w -linkmode external -extldflags "-static" -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.GitCommit=${GIT_COMMIT}${GIT_DIRTY} -X gitlab.jiangxingai.com/luyor/face-recognition-backend/version.BuildDate=${BUILD_DATE}' -o bin/${ARM_BIN_NAME}
 
 package:
 	@echo "building image ${BIN_NAME} ${VERSION} $(GIT_COMMIT)"
 	docker build -t $(IMAGE_NAME):local .
 
 tag: package
-	@echo "Tagging: latest ${VERSION} $(GIT_COMMIT)"
-	docker tag $(IMAGE_NAME):local $(IMAGE_NAME):latest
+	@echo "Tagging: x86_v1.0.0 ${VERSION} $(GIT_COMMIT)"
+	docker tag $(IMAGE_NAME):local $(IMAGE_NAME):x86_v1.0.0
 
 push: tag
-	@echo "Pushing docker image to registry: latest ${VERSION} $(GIT_COMMIT)"
-	docker push $(IMAGE_NAME):latest
+	@echo "Pushing docker image to registry: x86_v1.0.0 ${VERSION} $(GIT_COMMIT)"
+	docker push $(IMAGE_NAME):x86_v1.0.0
 
 clean:
 	@test ! -e bin/${BIN_NAME} || rm bin/${BIN_NAME}
