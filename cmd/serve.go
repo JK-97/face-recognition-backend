@@ -20,7 +20,9 @@ import (
 	"github.com/spf13/cobra"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/config"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/route"
+	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/timer"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
@@ -38,8 +40,17 @@ to quickly create a Cobra application.`,
 		model.InitDB()
 
 		go func() {
-			log.Fatal(http.ListenAndServe(":80", route.Routes()))
+			port, _ := cmd.Flags().GetString("port")
+			log.Fatal(http.ListenAndServe(":" + port, route.Routes()))
 		}()
+
+		go func() {
+			timer.Init()
+		}()
+
+        go func() {
+            remote.AddDevices()
+        }()
 
 		forever := make(chan struct{})
 		<-forever
@@ -53,7 +64,7 @@ func init() {
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	serveCmd.PersistentFlags().String("port", "80", "Port to run Application server on")
+	serveCmd.PersistentFlags().String("port", "8000", "Port to run Application server on")
 
 	cfg := config.Config()
 	serveCmd.PersistentFlags().String("db-addr", "mongodb://192.168.3.33", "Mongo db server address")
@@ -65,7 +76,9 @@ func init() {
 	serveCmd.PersistentFlags().String("face-ai-addr", "http://192.168.0.196:8008", "Face ai server address")
 	cfg.BindPFlag("face-ai-addr", serveCmd.PersistentFlags().Lookup("face-ai-addr"))
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+    serveCmd.PersistentFlags().String("login_type", "local", "Login type: local or gateway")
+	cfg.BindPFlag("login_type", serveCmd.PersistentFlags().Lookup("login_type"))
+
+    serveCmd.PersistentFlags().String("apigateway-addr", "http://192.168.0.196:8008", "APIGateway server address")
+	cfg.BindPFlag("apigateway-addr", serveCmd.PersistentFlags().Lookup("apigateway-addr"))
 }

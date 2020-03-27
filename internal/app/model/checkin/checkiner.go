@@ -7,13 +7,20 @@ import (
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/model/remote"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/schema"
 	"gitlab.jiangxingai.com/luyor/face-recognition-backend/internal/app/util"
-	"gitlab.jiangxingai.com/luyor/face-recognition-backend/log"
 )
 
 // DefaultCheckiner is the singleton of Checkiner
 var DefaultCheckiner = NewCheckiner()
 
+// CheckinID is last checkin timestamp
+var CheckinID int64
+
 type stopRespType struct {
+	time int64
+	err  error
+}
+
+type startRespType struct {
 	time int64
 	err  error
 }
@@ -21,20 +28,25 @@ type stopRespType struct {
 // Checkiner periodically run checkin.
 type Checkiner struct {
 	status  schema.CheckinStatus
-	startCh chan chan error
+	startCh chan chan startRespType
 	stopCh  chan chan stopRespType
 }
 
 // Start starts periodical checkin
-func (c *Checkiner) Start() error {
-	respCh := make(chan error)
+func (c *Checkiner) Start() (int64, error) {
+	respCh := make(chan startRespType)
 	c.startCh <- respCh
-	err := <-respCh
-	return err
+	startResp := <-respCh
+	CheckinID = startResp.time
+	return CheckinID, startResp.err
 }
 
 // Stop stops periodical checkin
-func (c *Checkiner) Stop() (int64, error) {
+func (c *Checkiner) Stop(id int64) (int64, error) {
+	if id != 0 && id != CheckinID {
+		return 0, fmt.Errorf("checkin was stopped")
+	}
+
 	respCh := make(chan stopRespType)
 	c.stopCh <- respCh
 	resp := <-respCh
@@ -51,7 +63,7 @@ func NewCheckiner() *Checkiner {
 	c := Checkiner{}
 
 	c.status = schema.STOPPED
-	c.startCh = make(chan chan error)
+	c.startCh = make(chan chan startRespType)
 	c.stopCh = make(chan chan stopRespType)
 
 	go c.serve()
@@ -62,6 +74,7 @@ func (c *Checkiner) serve() {
 	for {
 		startTime := c.waitStart()
 		c.status = schema.CHECKING
+        ResetCurrentPeopleSet()
 		c.detecting(startTime)
 		c.status = schema.STOPPED
 	}
@@ -73,7 +86,10 @@ func (c *Checkiner) waitStart() int64 {
 		case startResp := <-c.startCh:
 			startTime := util.NowMilli()
 			err := remote.CheckDetectAI()
-			startResp <- err
+			startResp <- startRespType{
+                time: startTime,
+                err: err,
+            }
 			if err == nil {
 				return startTime
 			}
@@ -84,13 +100,16 @@ func (c *Checkiner) waitStart() int64 {
 }
 
 func (c *Checkiner) detecting(startTime int64) {
-	ticker := time.NewTicker(500 * time.Millisecond)
+	ticker := time.NewTicker(100 * time.Millisecond)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case startResp := <-c.startCh:
-			startResp <- fmt.Errorf("checkin already started")
+			startResp <- startRespType{
+                time: CheckinID,
+                err: fmt.Errorf("checkin already started"),
+            }
 		case stopResp := <-c.stopCh:
 			saveCheckin(seal{
 				startTime: startTime,
@@ -98,12 +117,8 @@ func (c *Checkiner) detecting(startTime int64) {
 			})
 			stopResp <- stopRespType{startTime, nil}
 			return
-		default:
-			<-ticker.C
-			err := checkin()
-			if err != nil {
-				log.Error(err)
-			}
+        case <-ticker.C:
+			checkin()
 		}
 	}
 }
